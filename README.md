@@ -1,0 +1,4 @@
+CQPerfMonitor
+=============
+
+Qt Peformance Monitor

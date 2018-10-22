@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_CQPerfDialog_t {
-    QByteArrayData data[18];
-    char stringdata0[173];
+    QByteArrayData data[21];
+    char stringdata0[207];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -48,14 +48,18 @@ QT_MOC_LITERAL(13, 117, 14), // "valueComboSlot"
 QT_MOC_LITERAL(14, 132, 14), // "windowSizeSlot"
 QT_MOC_LITERAL(15, 147, 4), // "size"
 QT_MOC_LITERAL(16, 152, 10), // "recordSlot"
-QT_MOC_LITERAL(17, 163, 9) // "stateSlot"
+QT_MOC_LITERAL(17, 163, 9), // "stateSlot"
+QT_MOC_LITERAL(18, 173, 11), // "zoomOutSlot"
+QT_MOC_LITERAL(19, 185, 10), // "zoomInSlot"
+QT_MOC_LITERAL(20, 196, 10) // "scrollSlot"
 
     },
     "CQPerfDialog\0setName\0\0name\0setNames\0"
     "names\0updateWidgets\0enabledSlot\0state\0"
     "debugSlot\0typeComboSlot\0ind\0shapeComboSlot\0"
     "valueComboSlot\0windowSizeSlot\0size\0"
-    "recordSlot\0stateSlot"
+    "recordSlot\0stateSlot\0zoomOutSlot\0"
+    "zoomInSlot\0scrollSlot"
 };
 #undef QT_MOC_LITERAL
 
@@ -65,7 +69,7 @@ static const uint qt_meta_data_CQPerfDialog[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      11,   14, // methods
+      14,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -73,17 +77,20 @@ static const uint qt_meta_data_CQPerfDialog[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    1,   69,    2, 0x08 /* Private */,
-       4,    1,   72,    2, 0x08 /* Private */,
-       6,    0,   75,    2, 0x08 /* Private */,
-       7,    1,   76,    2, 0x08 /* Private */,
-       9,    1,   79,    2, 0x08 /* Private */,
-      10,    1,   82,    2, 0x08 /* Private */,
-      12,    1,   85,    2, 0x08 /* Private */,
-      13,    1,   88,    2, 0x08 /* Private */,
-      14,    1,   91,    2, 0x08 /* Private */,
-      16,    0,   94,    2, 0x08 /* Private */,
-      17,    0,   95,    2, 0x08 /* Private */,
+       1,    1,   84,    2, 0x08 /* Private */,
+       4,    1,   87,    2, 0x08 /* Private */,
+       6,    0,   90,    2, 0x08 /* Private */,
+       7,    1,   91,    2, 0x08 /* Private */,
+       9,    1,   94,    2, 0x08 /* Private */,
+      10,    1,   97,    2, 0x08 /* Private */,
+      12,    1,  100,    2, 0x08 /* Private */,
+      13,    1,  103,    2, 0x08 /* Private */,
+      14,    1,  106,    2, 0x08 /* Private */,
+      16,    0,  109,    2, 0x08 /* Private */,
+      17,    0,  110,    2, 0x08 /* Private */,
+      18,    0,  111,    2, 0x08 /* Private */,
+      19,    0,  112,    2, 0x08 /* Private */,
+      20,    1,  113,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void, QMetaType::QString,    3,
@@ -97,6 +104,9 @@ static const uint qt_meta_data_CQPerfDialog[] = {
     QMetaType::Void, QMetaType::Int,   15,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,    2,
 
        0        // eod
 };
@@ -118,6 +128,9 @@ void CQPerfDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         case 8: _t->windowSizeSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 9: _t->recordSlot(); break;
         case 10: _t->stateSlot(); break;
+        case 11: _t->zoomOutSlot(); break;
+        case 12: _t->zoomInSlot(); break;
+        case 13: _t->scrollSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -148,13 +161,13 @@ int CQPerfDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 11)
+        if (_id < 14)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 11;
+        _id -= 14;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 11)
+        if (_id < 14)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 11;
+        _id -= 14;
     }
     return _id;
 }

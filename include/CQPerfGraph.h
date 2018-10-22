@@ -40,6 +40,9 @@ class CQPerfDialog : public QDialog {
   void windowSizeSlot(int size);
   void recordSlot();
   void stateSlot();
+  void zoomOutSlot();
+  void zoomInSlot();
+  void scrollSlot(int);
 
  private:
   QCheckBox*     enableCheck_    { nullptr };
@@ -50,6 +53,7 @@ class CQPerfDialog : public QDialog {
   QSpinBox*      windowSizeSpin_ { nullptr };
   CQImageButton* recordButton_   { nullptr };
   CQPerfGraph*   graph_          { nullptr };
+  QScrollBar*    graphScroll_    { nullptr };
   CQPerfList*    list_           { nullptr };
   int            timeout_        { 250 };
   QTimer*        timer_          { nullptr };
@@ -92,6 +96,12 @@ class CQPerfGraph : public QFrame {
   bool isShowElapsed() const { return showElapsed_; }
   bool isShowCount  () const { return showCount_; }
 
+  int zoomFactor() const { return zoomFactor_; }
+  void setZoomFactor(int i) { zoomFactor_ = i; }
+
+  double zoomOffset() const { return zoomOffset_; }
+  void setZoomOffset(double r) { zoomOffset_ = r; }
+
   void contextMenuEvent(QContextMenuEvent *event);
 
   void paintEvent(QPaintEvent *);
@@ -103,6 +113,9 @@ class CQPerfGraph : public QFrame {
   void drawAxis(QPainter *p, const CInterval &interval, bool isLeft, bool isCalls);
 
   void drawGrid(QPainter *p, const CInterval &interval);
+
+  void zoomOut();
+  void zoomIn();
 
   bool event(QEvent *e);
 
@@ -149,6 +162,8 @@ class CQPerfGraph : public QFrame {
   bool        showRects_     { false };
   bool        showElapsed_   { true };
   bool        showCount_     { true };
+  int         zoomFactor_    { 1 };
+  double      zoomOffset_    { 0.0 };
   double      xmin_          { 0.0 };
   double      xmax_          { 1.0 };
   double      ymin1_         { 0.0 };

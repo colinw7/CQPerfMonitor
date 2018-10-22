@@ -11,6 +11,7 @@
 #include <QComboBox>
 #include <QSpinBox>
 #include <QLabel>
+#include <QScrollBar>
 #include <QVBoxLayout>
 #include <QPainter>
 #include <QTimer>
@@ -21,6 +22,8 @@
 
 #include <svg/record_svg.h>
 #include <svg/stop_svg.h>
+#include <svg/zoom_out_svg.h>
+#include <svg/zoom_in_svg.h>
 
 namespace {
 
@@ -90,6 +93,8 @@ CQPerfDialog(QWidget *parent) :
   QVBoxLayout *layout = new QVBoxLayout(this);
   layout->setMargin(0); layout->setSpacing(2);
 
+  //----
+
   QFrame *controlFrame = new QFrame;
   controlFrame->setObjectName("controlFrame");
 
@@ -156,6 +161,7 @@ CQPerfDialog(QWidget *parent) :
   //---
 
   recordButton_ = new CQImageButton(CQPixmapCacheInst->getIcon("RECORD"));
+  recordButton_->setObjectName("recordButton");
 
   if (CQPerfMonitorInst->isRecording())
     recordButton_->setIcon(CQPixmapCacheInst->getIcon("STOP"));
@@ -170,7 +176,7 @@ CQPerfDialog(QWidget *parent) :
 
   layout->addWidget(controlFrame);
 
-  //---
+  //----
 
   QSplitter *splitter = new QSplitter;
 
@@ -179,9 +185,68 @@ CQPerfDialog(QWidget *parent) :
 
   layout->addWidget(splitter);
 
+  //----
+
+  QFrame *graphFrame = new QFrame;
+  graphFrame->setObjectName("graphFrame");
+
+  QVBoxLayout *graphLayout = new QVBoxLayout(graphFrame);
+  graphLayout->setMargin(0); graphLayout->setSpacing(0);
+
+  splitter->addWidget(graphFrame);
+
+  //--
+
   graph_ = new CQPerfGraph(this);
 
   splitter->addWidget(graph_);
+
+  graphLayout->addWidget(graph_);
+
+  //--
+
+  QFrame *scrollFrame = new QFrame;
+  scrollFrame->setObjectName("scrollFrame");
+
+  scrollFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+  graphLayout->addWidget(scrollFrame);
+
+  //--
+
+  QHBoxLayout *scrollLayout = new QHBoxLayout(scrollFrame);
+  scrollLayout->setMargin(2); scrollLayout->setSpacing(2);
+
+  CQImageButton *zoomOutButton = new CQImageButton(CQPixmapCacheInst->getIcon("ZOOM_OUT"));
+  zoomOutButton->setObjectName("zoomOutButton");
+
+  connect(zoomOutButton, SIGNAL(clicked()), this, SLOT(zoomOutSlot()));
+
+  scrollLayout->addWidget(zoomOutButton);
+
+  graphScroll_ = new QScrollBar;
+  graphScroll_->setObjectName("graphScroll");
+
+  graphScroll_->setOrientation(Qt::Horizontal);
+  graphScroll_->setRange(0, 0);
+
+  connect(graphScroll_, SIGNAL(valueChanged(int)), this, SLOT(scrollSlot(int)));
+
+  scrollLayout->addWidget(graphScroll_);
+
+  CQImageButton *zoomInButton  = new CQImageButton(CQPixmapCacheInst->getIcon("ZOOM_IN"));
+  zoomInButton->setObjectName("zoomInButton");
+
+  connect(zoomInButton, SIGNAL(clicked()), this, SLOT(zoomInSlot()));
+
+  scrollLayout->addWidget(zoomInButton);
+
+  int s = graphScroll_->sizeHint().height() + 4;
+
+  zoomOutButton->setFixedSize(QSize(s, s));
+  zoomInButton ->setFixedSize(QSize(s, s));
+
+  //----
 
   list_ = new CQPerfList(this);
 
@@ -192,7 +257,7 @@ CQPerfDialog(QWidget *parent) :
   connect(list_, SIGNAL(namesSelected(const QStringList &)),
           this, SLOT(setNames(const QStringList &)));
 
-  //---
+  //----
 
   stateSlot();
 
@@ -388,6 +453,35 @@ stateSlot()
 
 void
 CQPerfDialog::
+zoomOutSlot()
+{
+  graph_->zoomOut();
+
+  graphScroll_->setPageStep(100);
+  graphScroll_->setRange(0, 100*(graph_->zoomFactor() - 1));
+}
+
+void
+CQPerfDialog::
+zoomInSlot()
+{
+  graph_->zoomIn();
+
+  graphScroll_->setPageStep(100);
+  graphScroll_->setRange(0, 100*(graph_->zoomFactor() - 1));
+}
+
+void
+CQPerfDialog::
+scrollSlot(int i)
+{
+  graph_->setZoomOffset(i/100.0);
+
+  graph_->update();
+}
+
+void
+CQPerfDialog::
 updateWidgets()
 {
   graph_->update ();
@@ -509,6 +603,11 @@ drawIntervalGraph(QPainter *p)
 
   xmin_ = startTime.getUSecs();
   xmax_ = endTime  .getUSecs();
+
+  double dx = (xmax_ - xmin_)/zoomFactor_;
+
+  xmin_ += zoomOffset()*dx;
+  xmax_ = xmin_ + dx;
 
   //---
 
@@ -650,7 +749,7 @@ drawIntervalGraph(QPainter *p)
   //---
 
   // draw x label
-  QString xlabel = formatTime(windowSize()*1000);
+  QString xlabel = formatTime(xmax_ - xmin_);
 
   tx = width()/2 - fm.width(xlabel)/2;
 
@@ -732,6 +831,8 @@ drawIntervalGraph(QPainter *p)
   }
 
   //---
+
+  p->setClipRect(irect);
 
   for (int i = 0; i < names_.length(); ++i) {
     TraceDrawData &traceDrawData = traceDrawDatas[i];
@@ -877,6 +978,11 @@ drawDepthGraph(QPainter *p)
 
   xmin_ = minTime.getUSecs();
   xmax_ = maxTime.getUSecs();
+
+  double dx = (xmax_ - xmin_)/zoomFactor_;
+
+  xmin_ += zoomOffset()*dx;
+  xmax_ = xmin_ + dx;
 
   //---
 
@@ -1030,7 +1136,9 @@ drawDepthGraph(QPainter *p)
 
   //---
 
-  QRect fullRect = rect();
+  p->setFont(axisFont_);
+
+  p->setClipRect(irect);
 
   for (int i = 0; i < names_.length(); ++i) {
     TraceRectTips &traceRectTips = traceDrawDatas[i];
@@ -1060,7 +1168,7 @@ drawDepthGraph(QPainter *p)
 
       p->drawText(rect.left() + 2, rect.center().y() + (fa - fd)/2, rectTip.name);
 
-      p->setClipRect(fullRect);
+      p->setClipRect(irect);
 
       tipRects_.push_back(TipRect(rect, rectTip.tip));
     }
@@ -1073,6 +1181,11 @@ drawStatsGraph(QPainter *p)
 {
   xmin_ = 0;
   xmax_ = names_.length();
+
+  double dx = (xmax_ - xmin_)/zoomFactor_;
+
+  xmin_ += zoomOffset()*dx;
+  xmax_ = xmin_ + dx;
 
   //---
 
@@ -1108,6 +1221,9 @@ drawStatsGraph(QPainter *p)
 
   // set margins
   QFontMetrics fm(font());
+
+  int fa = fm.ascent();
+//int fd = fm.descent();
 
   if      (isShowElapsed() && isShowCount()) {
     lmargin_ = fm.width(QString().sprintf("%d"  , maxCalls  )) + 8;
@@ -1158,9 +1274,40 @@ drawStatsGraph(QPainter *p)
 
   //---
 
+  p->setPen(Qt::black);
+
+  p->setFont(font());
+
+  // draw title
+  QString title;
+
+  for (int i = 0; i < names_.length(); ++i) {
+    if (i > 0)
+      title += ", ";
+
+    title += names_[i];
+  }
+
+  double tx = width()/2 - fm.width(title)/2;
+
+  p->drawText(tx, fa + 2, title);
+
+  //---
+
+  // draw x label
+  QString xlabel = formatTime(xmax_ - xmin_);
+
+  tx = width()/2 - fm.width(xlabel)/2;
+
+  p->drawText(tx, height() - fm.descent() - 2, xlabel);
+
+  //---
+
   tipRects_.clear();
 
   p->setPen(Qt::black);
+
+  p->setClipRect(irect);
 
   // draw counts
   for (int i = 0; i < names_.length(); ++i) {
@@ -1316,6 +1463,22 @@ drawGrid(QPainter *p, const CInterval &interval)
 
     p->drawLine(ax1, ay, ax2, ay);
   }
+}
+
+void
+CQPerfGraph::
+zoomOut()
+{
+  if (zoomFactor_ > 1)
+    --zoomFactor_;
+}
+
+void
+CQPerfGraph::
+zoomIn()
+{
+  if (zoomFactor_ < 16)
+    ++zoomFactor_;
 }
 
 bool

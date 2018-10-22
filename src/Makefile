@@ -451,7 +451,9 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 		../../CImageLib/include/CImageFile.h \
 		../../CQUtil/include/CQPixmapCache.h \
 		svg/record_svg.h \
-		svg/stop_svg.h
+		svg/stop_svg.h \
+		svg/zoom_out_svg.h \
+		svg/zoom_in_svg.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ../obj/CQPerfGraph.o CQPerfGraph.cpp
 
 ../obj/moc_CQPerfMonitor.o: .moc/moc_CQPerfMonitor.cpp 

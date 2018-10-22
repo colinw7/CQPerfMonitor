@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-TARGET = CQPerfMonitorTes
+TARGET = CQPerfMonitorTest
 
 QT += widgets svg
 

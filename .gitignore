@@ -1,0 +1,13 @@
+*.o
+*.a
+
+moc_*.cpp
+
+src/Makefile
+
+test/Makefile
+test/CQChartsTest
+
+bin/
+obj/
+lib/

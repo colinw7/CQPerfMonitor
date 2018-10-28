@@ -52,20 +52,20 @@ class CQPerfMonitor : public QObject {
   void startRecording();
   void stopRecording();
 
-  bool isTraceEnabled(const QString &name);
+  bool isTraceEnabled(const QString &name) const;
   void setTraceEnabled(const QString &name, bool enabled);
 
-  bool isTraceDebug(const QString &name);
+  bool isTraceDebug(const QString &name) const;
   void setTraceDebug(const QString &name, bool debug);
 
   void setTraceMaxTime (const QString &name, const CHRTime &t);
   void setTraceMaxCalls(const QString &name, int n);
 
-  void reportStats(const QString &name);
+  void reportStats(const QString &name) const;
 
   CQPerfTraceData *getTrace(const QString &name);
 
-  void getTraceNames(QStringList &names);
+  void getTraceNames(QStringList &names) const;
 
  signals:
   void stateChanged();

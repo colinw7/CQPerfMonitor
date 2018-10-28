@@ -127,9 +127,9 @@ stopRecording()
 
 bool
 CQPerfMonitor::
-isTraceEnabled(const QString &name)
+isTraceEnabled(const QString &name) const
 {
-  CQPerfTraceData *data = getTrace(name);
+  CQPerfTraceData *data = const_cast<CQPerfMonitor *>(this)->getTrace(name);
 
   return data->isEnabled();
 }
@@ -145,9 +145,9 @@ setTraceEnabled(const QString &name, bool enabled)
 
 bool
 CQPerfMonitor::
-isTraceDebug(const QString &name)
+isTraceDebug(const QString &name) const
 {
-  CQPerfTraceData *data = getTrace(name);
+  CQPerfTraceData *data = const_cast<CQPerfMonitor *>(this)->getTrace(name);
 
   return data->isDebug();
 }
@@ -181,16 +181,16 @@ setTraceMaxCalls(const QString &name, int n)
 
 void
 CQPerfMonitor::
-reportStats(const QString &name)
+reportStats(const QString &name) const
 {
-  CQPerfTraceData *data = getTrace(name);
+  CQPerfTraceData *data = const_cast<CQPerfMonitor *>(this)->getTrace(name);
 
   data->reportStats();
 }
 
 void
 CQPerfMonitor::
-getTraceNames(QStringList &names)
+getTraceNames(QStringList &names) const
 {
   for (auto &nt : traces_)
     names.push_back(nt.second->name());
@@ -377,7 +377,6 @@ reset()
   elapsed_    = CHRTime();
   elapsedMin_ = CHRTime();
   elapsedMax_ = CHRTime();
-
 }
 
 void

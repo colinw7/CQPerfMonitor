@@ -17,6 +17,8 @@ class QSpinBox;
 class CQPerfDialog : public QDialog {
   Q_OBJECT
 
+  Q_PROPERTY(int timeout READ timeout WRITE setTimeout);
+
  public:
   static CQPerfDialog *instance();
 
@@ -24,6 +26,9 @@ class CQPerfDialog : public QDialog {
 
  ~CQPerfDialog();
 
+  int timeout() const { return timeout_; }
+
+ public slots:
   void setTimeout(int t);
 
  private slots:

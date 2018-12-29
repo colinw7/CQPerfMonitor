@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_CQPerfDialog_t {
-    QByteArrayData data[21];
-    char stringdata0[207];
+    QByteArrayData data[24];
+    char stringdata0[228];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -32,34 +32,38 @@ struct qt_meta_stringdata_CQPerfDialog_t {
 static const qt_meta_stringdata_CQPerfDialog_t qt_meta_stringdata_CQPerfDialog = {
     {
 QT_MOC_LITERAL(0, 0, 12), // "CQPerfDialog"
-QT_MOC_LITERAL(1, 13, 7), // "setName"
-QT_MOC_LITERAL(2, 21, 0), // ""
-QT_MOC_LITERAL(3, 22, 4), // "name"
-QT_MOC_LITERAL(4, 27, 8), // "setNames"
-QT_MOC_LITERAL(5, 36, 5), // "names"
-QT_MOC_LITERAL(6, 42, 13), // "updateWidgets"
-QT_MOC_LITERAL(7, 56, 11), // "enabledSlot"
-QT_MOC_LITERAL(8, 68, 5), // "state"
-QT_MOC_LITERAL(9, 74, 9), // "debugSlot"
-QT_MOC_LITERAL(10, 84, 13), // "typeComboSlot"
-QT_MOC_LITERAL(11, 98, 3), // "ind"
-QT_MOC_LITERAL(12, 102, 14), // "shapeComboSlot"
-QT_MOC_LITERAL(13, 117, 14), // "valueComboSlot"
-QT_MOC_LITERAL(14, 132, 14), // "windowSizeSlot"
-QT_MOC_LITERAL(15, 147, 4), // "size"
-QT_MOC_LITERAL(16, 152, 10), // "recordSlot"
-QT_MOC_LITERAL(17, 163, 9), // "stateSlot"
-QT_MOC_LITERAL(18, 173, 11), // "zoomOutSlot"
-QT_MOC_LITERAL(19, 185, 10), // "zoomInSlot"
-QT_MOC_LITERAL(20, 196, 10) // "scrollSlot"
+QT_MOC_LITERAL(1, 13, 10), // "setTimeout"
+QT_MOC_LITERAL(2, 24, 0), // ""
+QT_MOC_LITERAL(3, 25, 1), // "t"
+QT_MOC_LITERAL(4, 27, 7), // "setName"
+QT_MOC_LITERAL(5, 35, 4), // "name"
+QT_MOC_LITERAL(6, 40, 8), // "setNames"
+QT_MOC_LITERAL(7, 49, 5), // "names"
+QT_MOC_LITERAL(8, 55, 13), // "updateWidgets"
+QT_MOC_LITERAL(9, 69, 11), // "enabledSlot"
+QT_MOC_LITERAL(10, 81, 5), // "state"
+QT_MOC_LITERAL(11, 87, 9), // "debugSlot"
+QT_MOC_LITERAL(12, 97, 13), // "typeComboSlot"
+QT_MOC_LITERAL(13, 111, 3), // "ind"
+QT_MOC_LITERAL(14, 115, 14), // "shapeComboSlot"
+QT_MOC_LITERAL(15, 130, 14), // "valueComboSlot"
+QT_MOC_LITERAL(16, 145, 14), // "windowSizeSlot"
+QT_MOC_LITERAL(17, 160, 4), // "size"
+QT_MOC_LITERAL(18, 165, 10), // "recordSlot"
+QT_MOC_LITERAL(19, 176, 9), // "stateSlot"
+QT_MOC_LITERAL(20, 186, 11), // "zoomOutSlot"
+QT_MOC_LITERAL(21, 198, 10), // "zoomInSlot"
+QT_MOC_LITERAL(22, 209, 10), // "scrollSlot"
+QT_MOC_LITERAL(23, 220, 7) // "timeout"
 
     },
-    "CQPerfDialog\0setName\0\0name\0setNames\0"
-    "names\0updateWidgets\0enabledSlot\0state\0"
-    "debugSlot\0typeComboSlot\0ind\0shapeComboSlot\0"
-    "valueComboSlot\0windowSizeSlot\0size\0"
-    "recordSlot\0stateSlot\0zoomOutSlot\0"
-    "zoomInSlot\0scrollSlot"
+    "CQPerfDialog\0setTimeout\0\0t\0setName\0"
+    "name\0setNames\0names\0updateWidgets\0"
+    "enabledSlot\0state\0debugSlot\0typeComboSlot\0"
+    "ind\0shapeComboSlot\0valueComboSlot\0"
+    "windowSizeSlot\0size\0recordSlot\0stateSlot\0"
+    "zoomOutSlot\0zoomInSlot\0scrollSlot\0"
+    "timeout"
 };
 #undef QT_MOC_LITERAL
 
@@ -69,44 +73,49 @@ static const uint qt_meta_data_CQPerfDialog[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      14,   14, // methods
-       0,    0, // properties
+      15,   14, // methods
+       1,  124, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    1,   84,    2, 0x08 /* Private */,
-       4,    1,   87,    2, 0x08 /* Private */,
-       6,    0,   90,    2, 0x08 /* Private */,
-       7,    1,   91,    2, 0x08 /* Private */,
-       9,    1,   94,    2, 0x08 /* Private */,
-      10,    1,   97,    2, 0x08 /* Private */,
-      12,    1,  100,    2, 0x08 /* Private */,
-      13,    1,  103,    2, 0x08 /* Private */,
-      14,    1,  106,    2, 0x08 /* Private */,
-      16,    0,  109,    2, 0x08 /* Private */,
-      17,    0,  110,    2, 0x08 /* Private */,
-      18,    0,  111,    2, 0x08 /* Private */,
-      19,    0,  112,    2, 0x08 /* Private */,
-      20,    1,  113,    2, 0x08 /* Private */,
+       1,    1,   89,    2, 0x0a /* Public */,
+       4,    1,   92,    2, 0x08 /* Private */,
+       6,    1,   95,    2, 0x08 /* Private */,
+       8,    0,   98,    2, 0x08 /* Private */,
+       9,    1,   99,    2, 0x08 /* Private */,
+      11,    1,  102,    2, 0x08 /* Private */,
+      12,    1,  105,    2, 0x08 /* Private */,
+      14,    1,  108,    2, 0x08 /* Private */,
+      15,    1,  111,    2, 0x08 /* Private */,
+      16,    1,  114,    2, 0x08 /* Private */,
+      18,    0,  117,    2, 0x08 /* Private */,
+      19,    0,  118,    2, 0x08 /* Private */,
+      20,    0,  119,    2, 0x08 /* Private */,
+      21,    0,  120,    2, 0x08 /* Private */,
+      22,    1,  121,    2, 0x08 /* Private */,
 
  // slots: parameters
-    QMetaType::Void, QMetaType::QString,    3,
-    QMetaType::Void, QMetaType::QStringList,    5,
+    QMetaType::Void, QMetaType::Int,    3,
+    QMetaType::Void, QMetaType::QString,    5,
+    QMetaType::Void, QMetaType::QStringList,    7,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,    8,
-    QMetaType::Void, QMetaType::Int,    8,
-    QMetaType::Void, QMetaType::Int,   11,
-    QMetaType::Void, QMetaType::Int,   11,
-    QMetaType::Void, QMetaType::Int,   11,
-    QMetaType::Void, QMetaType::Int,   15,
+    QMetaType::Void, QMetaType::Int,   10,
+    QMetaType::Void, QMetaType::Int,   10,
+    QMetaType::Void, QMetaType::Int,   13,
+    QMetaType::Void, QMetaType::Int,   13,
+    QMetaType::Void, QMetaType::Int,   13,
+    QMetaType::Void, QMetaType::Int,   17,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int,    2,
+
+ // properties: name, type, flags
+      23, QMetaType::Int, 0x00095103,
 
        0        // eod
 };
@@ -117,23 +126,44 @@ void CQPerfDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         CQPerfDialog *_t = static_cast<CQPerfDialog *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->setName((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 1: _t->setNames((*reinterpret_cast< const QStringList(*)>(_a[1]))); break;
-        case 2: _t->updateWidgets(); break;
-        case 3: _t->enabledSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 4: _t->debugSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 5: _t->typeComboSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 6: _t->shapeComboSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 7: _t->valueComboSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 8: _t->windowSizeSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 9: _t->recordSlot(); break;
-        case 10: _t->stateSlot(); break;
-        case 11: _t->zoomOutSlot(); break;
-        case 12: _t->zoomInSlot(); break;
-        case 13: _t->scrollSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 0: _t->setTimeout((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 1: _t->setName((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 2: _t->setNames((*reinterpret_cast< const QStringList(*)>(_a[1]))); break;
+        case 3: _t->updateWidgets(); break;
+        case 4: _t->enabledSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 5: _t->debugSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 6: _t->typeComboSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 7: _t->shapeComboSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 8: _t->valueComboSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 9: _t->windowSizeSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 10: _t->recordSlot(); break;
+        case 11: _t->stateSlot(); break;
+        case 12: _t->zoomOutSlot(); break;
+        case 13: _t->zoomInSlot(); break;
+        case 14: _t->scrollSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
     }
+#ifndef QT_NO_PROPERTIES
+    else if (_c == QMetaObject::ReadProperty) {
+        CQPerfDialog *_t = static_cast<CQPerfDialog *>(_o);
+        Q_UNUSED(_t)
+        void *_v = _a[0];
+        switch (_id) {
+        case 0: *reinterpret_cast< int*>(_v) = _t->timeout(); break;
+        default: break;
+        }
+    } else if (_c == QMetaObject::WriteProperty) {
+        CQPerfDialog *_t = static_cast<CQPerfDialog *>(_o);
+        Q_UNUSED(_t)
+        void *_v = _a[0];
+        switch (_id) {
+        case 0: _t->setTimeout(*reinterpret_cast< int*>(_v)); break;
+        default: break;
+        }
+    } else if (_c == QMetaObject::ResetProperty) {
+    }
+#endif // QT_NO_PROPERTIES
 }
 
 const QMetaObject CQPerfDialog::staticMetaObject = {
@@ -161,14 +191,31 @@ int CQPerfDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 14)
+        if (_id < 15)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 14;
+        _id -= 15;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 14)
+        if (_id < 15)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 14;
+        _id -= 15;
     }
+#ifndef QT_NO_PROPERTIES
+   else if (_c == QMetaObject::ReadProperty || _c == QMetaObject::WriteProperty
+            || _c == QMetaObject::ResetProperty || _c == QMetaObject::RegisterPropertyMetaType) {
+        qt_static_metacall(this, _c, _id, _a);
+        _id -= 1;
+    } else if (_c == QMetaObject::QueryPropertyDesignable) {
+        _id -= 1;
+    } else if (_c == QMetaObject::QueryPropertyScriptable) {
+        _id -= 1;
+    } else if (_c == QMetaObject::QueryPropertyStored) {
+        _id -= 1;
+    } else if (_c == QMetaObject::QueryPropertyEditable) {
+        _id -= 1;
+    } else if (_c == QMetaObject::QueryPropertyUser) {
+        _id -= 1;
+    }
+#endif // QT_NO_PROPERTIES
     return _id;
 }
 struct qt_meta_stringdata_CQPerfGraph_t {

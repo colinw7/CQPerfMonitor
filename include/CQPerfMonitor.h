@@ -7,14 +7,31 @@
 
 #include <map>
 #include <vector>
+#include <future>
 #include <iostream>
 
 class CQPerfTraceData;
 
 #define CQPerfMonitorInst CQPerfMonitor::getInstance()
 
+/*!
+ * \brief Class to collect statistics for elapsed time and number of calls of code block
+ */
 class CQPerfMonitor : public QObject {
   Q_OBJECT
+
+ public:
+  enum class TraceType {
+    ALL,
+    NO_RECORD
+  };
+
+  enum class AlertType {
+    CALLS,
+    TIME
+  };
+
+  using TraceList = std::vector<CQPerfTraceData *>;
 
  public:
   static CQPerfMonitor *getInstance() {
@@ -38,13 +55,14 @@ class CQPerfMonitor : public QObject {
   const CHRTime &windowTime() const { return windowTime_; }
   void setWindowTime(const CHRTime &v) { windowTime_ = v; }
 
-  void startTrace(const QString &name);
-  void endTrace  (const QString &name);
+  void startTrace(const QString &name, TraceType traceType=TraceType::ALL);
+  void endTrace  (const QString &name, TraceType traceType=TraceType::ALL);
 
   void startDebug(const QString &name);
   void endDebug  (const QString &name);
 
   void resetTrace(const QString &name);
+  void resetStartsWith(const QString &name);
   void resetAll();
 
   bool isRecording() const { return recording_; }
@@ -65,7 +83,11 @@ class CQPerfMonitor : public QObject {
 
   CQPerfTraceData *getTrace(const QString &name);
 
+  void getTracesStartingWith(const QString &name, TraceList &traces);
+
   void getTraceNames(QStringList &names) const;
+
+  void alert(const CQPerfTraceData *trace, CQPerfMonitor::AlertType type);
 
  signals:
   void stateChanged();
@@ -76,18 +98,20 @@ class CQPerfMonitor : public QObject {
   CQPerfMonitor();
 
  private:
-  typedef std::map<QString,CQPerfTraceData *> Traces;
+  using Traces = std::map<QString,CQPerfTraceData *>;
 
-  bool    enabled_     { false };
-  bool    debug_       { false };
-  bool    recording_   { false };
-  Traces  traces_;
-  int     windowCount_ { 1000 };
-  CHRTime windowTime_;
-  int     numTrace_    { 0 };
-  int     numDebug_    { 0 };
+  bool               enabled_     { false }; //!< is trace enabled
+  bool               debug_       { false }; //!< is debug enabled
+  bool               recording_   { false }; //!< is recording
+  Traces             traces_;                //!< active traces
+  int                windowCount_ { 1000 };  //!< number of traces to keep in history
+  CHRTime            windowTime_;            //!< time span for history
+  int                numTrace_    { 0 };     //!< number of active traces
+  int                numDebug_    { 0 };     //!< number of active debugs
+  mutable std::mutex mutex_;                 //!< update mutex
 };
 
+//---
 
 class CQPerfTraceData {
  public:
@@ -116,7 +140,7 @@ class CQPerfTraceData {
   //---
 
   void startTrace(int depth=0);
-  void endTrace  ();
+  void endTrace  (CQPerfMonitor::TraceType traceType);
 
   //---
 
@@ -191,32 +215,33 @@ class CQPerfTraceData {
   }
 
  private:
-  QString   name_;
-  bool      enabled_      { true };
-  bool      debug_        { false };
-  bool      recording_    { false };
-  TimeData  timeData_;
-  TimeDatas times_;
-  TimeDatas recordTimes_;
-  int       posStart_     { 0 };
-  int       posStartNext_ { 0 };
-  int       sizeLimit_    { -1 };
-  int       calls_        { 0 };
-  CHRTime   elapsed_;
-  CHRTime   elapsedMin_;
-  CHRTime   elapsedMax_;
-  int       maxCalls_     { -1 };
-  CHRTime   maxTime_;
+  QString   name_;                   //<! trace name
+  bool      enabled_      { true };  //<! is enabled
+  bool      debug_        { false }; //<! is debug enabled
+  bool      recording_    { false }; //<! is recording
+  TimeData  timeData_;               //<! time data
+  TimeDatas times_;                  //<! history times
+  TimeDatas recordTimes_;            //<! recorded times
+  int       posStart_     { 0 };     //<! window start
+  int       posStartNext_ { 0 };     //<! window next start
+  int       sizeLimit_    { -1 };    //<! window size limit
+  int       calls_        { 0 };     //<! number of calls
+  CHRTime   elapsed_;                //<! last elapsed time
+  CHRTime   elapsedMin_;             //<! min elapsed time
+  CHRTime   elapsedMax_;             //<! max elapsed time
+  int       maxCalls_     { -1 };    //<! max calls before alert
+  CHRTime   maxTime_;                //<! max elapsed time before alert
 };
 
 //------
 
 class CQPerfTrace {
  public:
-  CQPerfTrace(const QString &name) :
-   name_(name) {
+  CQPerfTrace(const QString &name,
+              CQPerfMonitor::TraceType traceType=CQPerfMonitor::TraceType::ALL) :
+   name_(name), traceType_(traceType) {
     if (CQPerfMonitorInst->isEnabled())
-      CQPerfMonitorInst->startTrace(name_);
+      CQPerfMonitorInst->startTrace(name_, traceType_);
 
     if (CQPerfMonitorInst->isDebug())
       CQPerfMonitorInst->startDebug(name_);
@@ -227,11 +252,12 @@ class CQPerfTrace {
       CQPerfMonitorInst->endDebug(name_);
 
     if (CQPerfMonitorInst->isEnabled())
-      CQPerfMonitorInst->endTrace(name_);
+      CQPerfMonitorInst->endTrace(name_, traceType_);
   }
 
  private:
-  QString name_;
+  QString                  name_;
+  CQPerfMonitor::TraceType traceType_ { CQPerfMonitor::TraceType::ALL };
 };
 
 #endif

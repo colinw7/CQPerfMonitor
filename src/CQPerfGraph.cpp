@@ -1152,25 +1152,35 @@ drawDepthGraph(QPainter *p)
       countToPixel(r.left (), r.bottom(), px1, py1);
       countToPixel(r.right(), r.top   (), px2, py2);
 
-      QColor pc = QColor("#000000"); pc.setAlphaF(0.5);
-      p->setPen(pc);
+      if (px2 - px1 > 3) {
+        QColor pc = QColor("#000000"); pc.setAlphaF(0.5);
+        p->setPen(pc);
 
-      QColor c = bgColor(i);
-      p->setBrush(c);
+        QColor c = bgColor(i);
+        p->setBrush(c);
 
-      QRectF rect(px1, py1, px2 - px1, py2 - py1);
+        QRectF rect(px1, py1, px2 - px1, py2 - py1);
 
-      p->drawRect(rect);
+        p->drawRect(rect);
 
-      p->setPen(Qt::black);
+        if (rect.width() > 2*fa) {
+          p->setPen(Qt::black);
 
-      p->setClipRect(rect.adjusted(2, 2, -2, -2));
+          p->setClipRect(rect.adjusted(2, 2, -2, -2));
 
-      p->drawText(rect.left() + 2, rect.center().y() + (fa - fd)/2, rectTip.name);
+          p->drawText(rect.left() + 2, rect.center().y() + (fa - fd)/2, rectTip.name);
 
-      p->setClipRect(irect);
+          p->setClipRect(irect);
+        }
 
-      tipRects_.push_back(TipRect(rect, rectTip.tip));
+        tipRects_.push_back(TipRect(rect, rectTip.tip));
+      }
+      else {
+        QColor c = bgColor(i);
+        p->setPen(c);
+
+        p->drawLine((px1 + px2)/2, py1, (px1 + px2)/2, py2);
+      }
     }
   }
 }
@@ -1537,11 +1547,57 @@ elapsedToPixel(double x, double y, double &px, double &py)
 
 //---
 
+class CQPerfListRealItem : public QTableWidgetItem {
+ public:
+  CQPerfListRealItem(double r=0.0) {
+    setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
+
+    setValue(r);
+  }
+
+  bool operator<(const QTableWidgetItem &rhs) const {
+    const CQPerfListRealItem &rrhs = dynamic_cast<const CQPerfListRealItem &>(rhs);
+
+    return (value_ < rrhs.value_);
+  }
+
+  double value() const { return value_; }
+  void setValue(double r) { value_ = r; setText(QString().sprintf("%.6f", value_)); }
+
+ private:
+  double value_ { 0.0 };
+};
+
+class CQPerfListIntItem : public QTableWidgetItem {
+ public:
+  CQPerfListIntItem(int i=0) {
+    setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
+
+    setValue(i);
+  }
+
+  bool operator<(const QTableWidgetItem &rhs) const {
+    const CQPerfListIntItem &irhs = dynamic_cast<const CQPerfListIntItem &>(rhs);
+
+    return (value_ < irhs.value_);
+  }
+
+  int value() const { return value_; }
+  void setValue(int i) { value_ = i; setText(QString().sprintf("%d", value_)); }
+
+ private:
+  int value_ { 0 };
+};
+
 CQPerfList::
 CQPerfList(QWidget *parent) :
  QTableWidget(parent)
 {
   setObjectName("list");
+
+  setSortingEnabled(true);
+
+  horizontalHeader()->setSectionsClickable(true);
 
   if (isSingleSelect())
     setSelectionMode(QAbstractItemView::SingleSelection);
@@ -1574,28 +1630,25 @@ reload()
   setColumnCount(7);
   setRowCount(names.length());
 
-  setHorizontalHeaderItem(0, new QTableWidgetItem("Enabled"    ));
-  setHorizontalHeaderItem(1, new QTableWidgetItem("Debug"      ));
-  setHorizontalHeaderItem(2, new QTableWidgetItem("Name"       ));
-  setHorizontalHeaderItem(3, new QTableWidgetItem("Count"      ));
-  setHorizontalHeaderItem(4, new QTableWidgetItem("Elapsed"    ));
-  setHorizontalHeaderItem(5, new QTableWidgetItem("Min Elapsed"));
-  setHorizontalHeaderItem(6, new QTableWidgetItem("Max Elapsed"));
+  setHorizontalHeaderItem(0, new QTableWidgetItem("Enabled"         ));
+  setHorizontalHeaderItem(1, new QTableWidgetItem("Debug"           ));
+  setHorizontalHeaderItem(2, new QTableWidgetItem("Name"            ));
+  setHorizontalHeaderItem(3, new QTableWidgetItem("Count"           ));
+  setHorizontalHeaderItem(4, new QTableWidgetItem("Elapsed (s)"     ));
+  setHorizontalHeaderItem(5, new QTableWidgetItem("Min Elapsed (ms)"));
+  setHorizontalHeaderItem(6, new QTableWidgetItem("Max Elapsed (ms)"));
 
   for (int i = 0; i < names.length(); ++i) {
-    QTableWidgetItem *enabledItem = new QTableWidgetItem("");
-    QTableWidgetItem *debugItem   = new QTableWidgetItem("");
-    QTableWidgetItem *nameItem    = new QTableWidgetItem(names[i]);
-    QTableWidgetItem *countItem   = new QTableWidgetItem("");
-    QTableWidgetItem *elapsedItem = new QTableWidgetItem("");
-    QTableWidgetItem *minItem     = new QTableWidgetItem("");
-    QTableWidgetItem *maxItem     = new QTableWidgetItem("");
+    QTableWidgetItem   *enabledItem = new QTableWidgetItem("");
+    QTableWidgetItem   *debugItem   = new QTableWidgetItem("");
+    QTableWidgetItem   *nameItem    = new QTableWidgetItem(names[i]);
+    CQPerfListIntItem  *countItem   = new CQPerfListIntItem ();
+    CQPerfListRealItem *elapsedItem = new CQPerfListRealItem();
+    CQPerfListRealItem *minItem     = new CQPerfListRealItem();
+    CQPerfListRealItem *maxItem     = new CQPerfListRealItem();
 
     enabledItem->setCheckState(Qt::Unchecked);
     debugItem  ->setCheckState(Qt::Unchecked);
-    elapsedItem->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
-    minItem    ->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
-    maxItem    ->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
 
     setItem(i, 0, enabledItem);
     setItem(i, 1, debugItem  );
@@ -1612,13 +1665,13 @@ CQPerfList::
 refresh()
 {
   for (int i = 0; i < rowCount(); ++i) {
-    QTableWidgetItem *enabledItem = item(i, 0);
-    QTableWidgetItem *debugItem   = item(i, 1);
-    QTableWidgetItem *nameItem    = item(i, 2);
-    QTableWidgetItem *countItem   = item(i, 3);
-    QTableWidgetItem *elapsedItem = item(i, 4);
-    QTableWidgetItem *minItem     = item(i, 5);
-    QTableWidgetItem *maxItem     = item(i, 6);
+    QTableWidgetItem   *enabledItem = item(i, 0);
+    QTableWidgetItem   *debugItem   = item(i, 1);
+    QTableWidgetItem   *nameItem    = item(i, 2);
+    CQPerfListIntItem  *countItem   = dynamic_cast<CQPerfListIntItem  *>(item(i, 3));
+    CQPerfListRealItem *elapsedItem = dynamic_cast<CQPerfListRealItem *>(item(i, 4));
+    CQPerfListRealItem *minItem     = dynamic_cast<CQPerfListRealItem *>(item(i, 5));
+    CQPerfListRealItem *maxItem     = dynamic_cast<CQPerfListRealItem *>(item(i, 6));
 
     QString name = nameItem->text();
 
@@ -1627,10 +1680,10 @@ refresh()
     enabledItem->setCheckState(data->isEnabled() ? Qt::Checked : Qt::Unchecked);
     debugItem  ->setCheckState(data->isDebug  () ? Qt::Checked : Qt::Unchecked);
 
-    countItem  ->setText(QString("%1").arg(data->numCalls()));
-    elapsedItem->setText(QString().sprintf("%.6f", data->elapsed   ().getSecs ()));
-    minItem    ->setText(QString().sprintf("%.6f", data->elapsedMin().getMSecs()));
-    maxItem    ->setText(QString().sprintf("%.6f", data->elapsedMax().getMSecs()));
+    countItem  ->setValue(data->numCalls());
+    elapsedItem->setValue(data->elapsed   ().getSecs ());
+    minItem    ->setValue(data->elapsedMin().getMSecs());
+    maxItem    ->setValue(data->elapsedMax().getMSecs());
 
     nameItem   ->setToolTip(nameItem   ->text());
     countItem  ->setToolTip(countItem  ->text());

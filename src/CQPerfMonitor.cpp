@@ -28,11 +28,13 @@ setDebug(bool b)
 
 void
 CQPerfMonitor::
-startTrace(const QString &name)
+startTrace(const QString &name, CQPerfMonitor::TraceType)
 {
   CQPerfTraceData *data = getTrace(name);
 
   if (data->isEnabled()) {
+    std::unique_lock<std::mutex> lock(mutex_);
+
     ++numTrace_;
 
     data->startTrace(numTrace_);
@@ -41,12 +43,14 @@ startTrace(const QString &name)
 
 void
 CQPerfMonitor::
-endTrace(const QString &name)
+endTrace(const QString &name, CQPerfMonitor::TraceType traceType)
 {
   CQPerfTraceData *data = getTrace(name);
 
   if (data->isEnabled()) {
-    data->endTrace();
+    std::unique_lock<std::mutex> lock(mutex_);
+
+    data->endTrace(traceType);
 
     --numTrace_;
   }
@@ -59,6 +63,8 @@ startDebug(const QString &name)
   CQPerfTraceData *data = getTrace(name);
 
   if (data->isDebug()) {
+    std::unique_lock<std::mutex> lock(mutex_);
+
     ++numDebug_;
 
     QString msg = QString(">%1%2").arg(" ", numDebug_).arg(name);
@@ -76,6 +82,8 @@ endDebug(const QString &name)
   CQPerfTraceData *data = getTrace(name);
 
   if (data->isDebug()) {
+    std::unique_lock<std::mutex> lock(mutex_);
+
     data->endDebug();
 
     const CHRTime &e = data->elapsedTime();
@@ -94,13 +102,29 @@ resetTrace(const QString &name)
 {
   CQPerfTraceData *data = getTrace(name);
 
+  std::unique_lock<std::mutex> lock(mutex_);
+
   data->reset();
+}
+
+void
+CQPerfMonitor::
+resetStartsWith(const QString &name)
+{
+  std::unique_lock<std::mutex> lock(mutex_);
+
+  for (auto &nt : traces_) {
+    if (nt.second->name().startsWith(name))
+      nt.second->reset();
+  }
 }
 
 void
 CQPerfMonitor::
 resetAll()
 {
+  std::unique_lock<std::mutex> lock(mutex_);
+
   for (auto &nt : traces_)
     nt.second->reset();
 }
@@ -109,6 +133,8 @@ void
 CQPerfMonitor::
 startRecording()
 {
+  std::unique_lock<std::mutex> lock(mutex_);
+
   recording_ = true;
 
   for (auto &nt : traces_)
@@ -119,6 +145,8 @@ void
 CQPerfMonitor::
 stopRecording()
 {
+  std::unique_lock<std::mutex> lock(mutex_);
+
   for (auto &nt : traces_)
     nt.second->stopRecording();
 
@@ -140,6 +168,8 @@ setTraceEnabled(const QString &name, bool enabled)
 {
   CQPerfTraceData *data = getTrace(name);
 
+  std::unique_lock<std::mutex> lock(mutex_);
+
   data->setEnabled(enabled);
 }
 
@@ -158,6 +188,8 @@ setTraceDebug(const QString &name, bool debug)
 {
   CQPerfTraceData *data = getTrace(name);
 
+  std::unique_lock<std::mutex> lock(mutex_);
+
   data->setDebug(debug);
 }
 
@@ -167,6 +199,8 @@ setTraceMaxTime(const QString &name, const CHRTime &t)
 {
   CQPerfTraceData *data = getTrace(name);
 
+  std::unique_lock<std::mutex> lock(mutex_);
+
   data->setMaxTime(t);
 }
 
@@ -175,6 +209,8 @@ CQPerfMonitor::
 setTraceMaxCalls(const QString &name, int n)
 {
   CQPerfTraceData *data = getTrace(name);
+
+  std::unique_lock<std::mutex> lock(mutex_);
 
   data->setMaxCalls(n);
 }
@@ -192,8 +228,22 @@ void
 CQPerfMonitor::
 getTraceNames(QStringList &names) const
 {
+  std::unique_lock<std::mutex> lock(mutex_);
+
   for (auto &nt : traces_)
     names.push_back(nt.second->name());
+}
+
+void
+CQPerfMonitor::
+getTracesStartingWith(const QString &name, TraceList &traces)
+{
+  std::unique_lock<std::mutex> lock(mutex_);
+
+  for (auto &nt : traces_) {
+    if (nt.second->name().startsWith(name))
+      traces.push_back(nt.second);
+  }
 }
 
 CQPerfTraceData *
@@ -203,6 +253,8 @@ getTrace(const QString &name)
   Traces::iterator p = traces_.find(name);
 
   if (p == traces_.end()) {
+    std::unique_lock<std::mutex> lock(mutex_);
+
     CQPerfTraceData *traceData = new CQPerfTraceData(name);
 
     p = traces_.insert(p, Traces::value_type(name, traceData));
@@ -214,6 +266,19 @@ getTrace(const QString &name)
   }
 
   return (*p).second;
+}
+
+void
+CQPerfMonitor::
+alert(const CQPerfTraceData *trace, CQPerfMonitor::AlertType type)
+{
+  // TODO: customize behavior
+  std::cerr << "Alert: " << trace->name().toStdString();
+  if      (type == AlertType::CALLS) std::cerr << " (Calls)";
+  else if (type == AlertType::TIME ) std::cerr << " (Time)";
+  std::cerr << "\n";
+
+  assert(false);
 }
 
 //---
@@ -248,7 +313,7 @@ startTrace(int depth)
 
 void
 CQPerfTraceData::
-endTrace()
+endTrace(CQPerfMonitor::TraceType traceType)
 {
   // calc elapsed time
   CHRTime endTime = CHRTime::getTime();
@@ -305,8 +370,10 @@ endTrace()
   else
     times_.push_back(timeData_);
 
-  if (recording_)
-    recordTimes_.push_back(timeData_);
+  if (recording_) {
+    if (traceType != CQPerfMonitor::TraceType::NO_RECORD)
+      recordTimes_.push_back(timeData_);
+  }
 
   //---
 
@@ -325,10 +392,10 @@ endTrace()
   //---
 
   if (maxCalls_ > 0 && calls_ > maxCalls_)
-    assert(false);
+    CQPerfMonitorInst->alert(this, CQPerfMonitor::AlertType::CALLS);
 
   if (maxTime_.isSet() && elapsedMax_ > maxTime_)
-    assert(false);
+    CQPerfMonitorInst->alert(this, CQPerfMonitor::AlertType::TIME);
 }
 
 void

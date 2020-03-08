@@ -166,6 +166,8 @@ class CQPerfTraceData {
   bool isDebug() const { return debug_; }
   void setDebug(bool b) { debug_ = b; }
 
+  int sizeLimit() const { return sizeLimit_; }
+
   int numCalls() const { return calls_; }
 
   const CHRTime &elapsed() const { return elapsed_; }

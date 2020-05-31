@@ -9,7 +9,7 @@ class CQPerfMonitorTest : public QFrame {
   Q_OBJECT
 
  public:
-  CQPerfMonitorTest();
+  CQPerfMonitorTest(bool server);
  ~CQPerfMonitorTest();
 
   QSize sizeHint() const { return QSize(800, 600); }

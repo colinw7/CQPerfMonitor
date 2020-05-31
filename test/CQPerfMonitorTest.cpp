@@ -11,11 +11,19 @@ main(int argc, char **argv)
 {
   CQApp app(argc, argv);
 
+  bool server = false;
+  bool client = false;
+
   for (int i = 1; i < argc; ++i) {
     if (argv[i][0] == '-') {
       std::string arg = &argv[i][1];
 
-      std::cerr << "Invalid option '" << arg << "'\n";
+      if      (arg == "server")
+        server = true;
+      else if (arg == "client")
+        client = true;
+      else
+        std::cerr << "Invalid option '" << arg << "'\n";
     }
     else {
       std::cerr << "Invalid arg '" << argv[i] << "'\n";
@@ -24,7 +32,14 @@ main(int argc, char **argv)
 
   //---
 
-  CQPerfMonitorTest test;
+  if      (server)
+    CQPerfMonitorInst->createServer();
+  else if (client)
+    CQPerfMonitorInst->createClient();
+
+  //---
+
+  CQPerfMonitorTest test(server);
 
   test.show();
 
@@ -36,15 +51,17 @@ main(int argc, char **argv)
 //-----
 
 CQPerfMonitorTest::
-CQPerfMonitorTest()
+CQPerfMonitorTest(bool server)
 {
   CQPerfTrace trace("CQPerfMonitorTest::CQPerfMonitorTest");
 
-  timer_ = new QTimer;
+  if (! server) {
+    timer_ = new QTimer(this);
 
-  connect(timer_, SIGNAL(timeout()), this, SLOT(timerSlot()));
+    connect(timer_, SIGNAL(timeout()), this, SLOT(timerSlot()));
 
-  timer_->start(1000);
+    timer_->start(1000);
+  }
 }
 
 CQPerfMonitorTest::

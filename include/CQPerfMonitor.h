@@ -11,8 +11,16 @@
 #include <iostream>
 
 class CQPerfTraceData;
+class QTimer;
+class CMessage;
 
 #define CQPerfMonitorInst CQPerfMonitor::getInstance()
+
+struct CQPerfTimeData {
+  int     depth { 0 };
+  CHRTime start;
+  CHRTime elapsed;
+};
 
 /*!
  * \brief Class to collect statistics for elapsed time and number of calls of code block
@@ -32,6 +40,7 @@ class CQPerfMonitor : public QObject {
   };
 
   using TraceList = std::vector<CQPerfTraceData *>;
+  using TimeData  = CQPerfTimeData;
 
  public:
   static CQPerfMonitor *getInstance() {
@@ -43,11 +52,22 @@ class CQPerfMonitor : public QObject {
     return inst;
   }
 
+ ~CQPerfMonitor();
+
+  //---
+
   bool isEnabled() const { return enabled_; }
   void setEnabled(bool b);
 
   bool isDebug() const { return debug_; }
   void setDebug(bool b);
+
+  //---
+
+  void createServer(const QString &name="");
+  void createClient(const QString &name="");
+
+  //---
 
   int windowCount() const { return windowCount_; }
   void setWindowCount(int i) { windowCount_ = i; }
@@ -57,9 +77,12 @@ class CQPerfMonitor : public QObject {
 
   void startTrace(const QString &name, TraceType traceType=TraceType::ALL);
   void endTrace  (const QString &name, TraceType traceType=TraceType::ALL);
+  void addTrace  (const QString &name, const TimeData &timeData,
+                  CQPerfMonitor::TraceType traceType);
 
   void startDebug(const QString &name);
   void endDebug  (const QString &name);
+  void addDebug  (const QString &name, const TimeData &timeData);
 
   void resetTrace(const QString &name);
   void resetStartsWith(const QString &name);
@@ -94,6 +117,9 @@ class CQPerfMonitor : public QObject {
 
   void traceAdded(const QString &name);
 
+ private slots:
+  void serverSlot();
+
  private:
   CQPerfMonitor();
 
@@ -109,6 +135,9 @@ class CQPerfMonitor : public QObject {
   int                numTrace_    { 0 };     //!< number of active traces
   int                numDebug_    { 0 };     //!< number of active debugs
   mutable std::mutex mutex_;                 //!< update mutex
+  CMessage*          message_     { nullptr };
+  QTimer*            serverTimer_ { nullptr };
+  bool               server_      { false };
 };
 
 //---
@@ -124,12 +153,8 @@ class CQPerfTraceData {
 
   using WindowDatas = std::vector<WindowData>;
 
-  struct TimeData {
-    int     depth { 0 };
-    CHRTime start;
-    CHRTime elapsed;
-  };
-
+  using TraceType = CQPerfMonitor::TraceType;
+  using TimeData  = CQPerfTimeData;
   using TimeDatas = std::vector<TimeData>;
 
  public:
@@ -140,12 +165,14 @@ class CQPerfTraceData {
   //---
 
   void startTrace(int depth=0);
-  void endTrace  (CQPerfMonitor::TraceType traceType);
+  void endTrace  (TraceType traceType);
+  void addTrace  (const TimeData &timeData, TraceType traceType);
 
   //---
 
   void startDebug(int depth=0);
   void endDebug  ();
+  void addDebug  (const TimeData &timeData);
 
   //---
 
@@ -239,8 +266,10 @@ class CQPerfTraceData {
 
 class CQPerfTrace {
  public:
-  CQPerfTrace(const QString &name,
-              CQPerfMonitor::TraceType traceType=CQPerfMonitor::TraceType::ALL) :
+  using TraceType = CQPerfMonitor::TraceType;
+
+ public:
+  CQPerfTrace(const QString &name, TraceType traceType=TraceType::ALL) :
    name_(name), traceType_(traceType) {
     if (CQPerfMonitorInst->isEnabled())
       CQPerfMonitorInst->startTrace(name_, traceType_);
@@ -258,8 +287,8 @@ class CQPerfTrace {
   }
 
  private:
-  QString                  name_;
-  CQPerfMonitor::TraceType traceType_ { CQPerfMonitor::TraceType::ALL };
+  QString   name_;
+  TraceType traceType_ { TraceType::ALL };
 };
 
 #endif

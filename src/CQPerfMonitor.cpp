@@ -1,5 +1,8 @@
 #include <CQPerfMonitor.h>
+#include <CMessage.h>
 #include <CEnv.h>
+
+#include <QTimer>
 
 CQPerfMonitor::
 CQPerfMonitor()
@@ -7,6 +10,14 @@ CQPerfMonitor()
   CEnvInst.get("CQ_PERF_MONITOR_ENABLED", enabled_);
   CEnvInst.get("CQ_PERF_MONITOR_DEBUG"  , debug_  );
 }
+
+CQPerfMonitor::
+~CQPerfMonitor()
+{
+  delete message_;
+}
+
+//---
 
 void
 CQPerfMonitor::
@@ -26,10 +37,67 @@ setDebug(bool b)
   emit stateChanged();
 }
 
+//---
+
 void
 CQPerfMonitor::
-startTrace(const QString &name, CQPerfMonitor::TraceType)
+createServer(const QString &name)
 {
+  std::string msgName = "CQ_PERF_MONITOR";
+
+  if (name != "")
+    msgName = name.toStdString();
+
+  assert(! message_);
+
+  message_ = new CMessage(msgName);
+  server_  = true;
+
+  serverTimer_ = new QTimer(this);
+
+  connect(serverTimer_, SIGNAL(timeout()), this, SLOT(serverSlot()));
+
+  serverTimer_->start(100);
+}
+
+void
+CQPerfMonitor::
+createClient(const QString &name)
+{
+  std::string msgName = "CQ_PERF_MONITOR";
+
+  if (name != "")
+    msgName = name.toStdString();
+
+  assert(! message_);
+
+  message_ = new CMessage(msgName);
+  server_  = false;
+}
+
+void
+CQPerfMonitor::
+serverSlot()
+{
+  std::string msg;
+
+  if (message_->recvClientMessage(msg)) {
+    if      (msg[0] == '>')
+      startTrace(QString(msg.substr(1).c_str()));
+    else if (msg[0] == '<')
+      endTrace(QString(msg.substr(1).c_str()));
+  }
+}
+
+//---
+
+void
+CQPerfMonitor::
+startTrace(const QString &name, TraceType)
+{
+  if (message_ && ! server_)
+    message_->sendClientMessage(">" + name.toStdString());
+
   CQPerfTraceData *data = getTrace(name);
 
   if (data->isEnabled()) {
@@ -43,14 +111,32 @@ startTrace(const QString &name, CQPerfMonitor::TraceType)
 
 void
 CQPerfMonitor::
-endTrace(const QString &name, CQPerfMonitor::TraceType traceType)
+endTrace(const QString &name, TraceType traceType)
 {
+  if (message_ && ! server_)
+    message_->sendClientMessage("<" + name.toStdString());
+
   CQPerfTraceData *data = getTrace(name);
 
   if (data->isEnabled()) {
     std::unique_lock<std::mutex> lock(mutex_);
 
     data->endTrace(traceType);
+
+    --numTrace_;
+  }
+}
+
+void
+CQPerfMonitor::
+addTrace(const QString &name, const TimeData &timeData, TraceType traceType)
+{
+  CQPerfTraceData *data = getTrace(name);
+
+  if (data->isEnabled()) {
+    std::unique_lock<std::mutex> lock(mutex_);
+
+    data->addTrace(timeData, traceType);
 
     --numTrace_;
   }
@@ -93,6 +179,25 @@ endDebug(const QString &name)
     std::cerr << msg.toStdString() << "\n";
 
     --numDebug_;
+  }
+}
+
+void
+CQPerfMonitor::
+addDebug(const QString &name, const TimeData &timeData)
+{
+  CQPerfTraceData *data = getTrace(name);
+
+  if (data->isDebug()) {
+    std::unique_lock<std::mutex> lock(mutex_);
+
+    data->addDebug(timeData);
+
+    const CHRTime &e = timeData.elapsed;
+
+    QString msg = QString("%1%2 %3").arg(" ", numDebug_).arg(name).arg(e.getSecs(), 0, 'f', 6);
+
+    std::cerr << msg.toStdString() << "\n";
   }
 }
 
@@ -250,6 +355,8 @@ CQPerfTraceData *
 CQPerfMonitor::
 getTrace(const QString &name)
 {
+  bool added = false;
+
   Traces::iterator p = traces_.find(name);
 
   if (p == traces_.end()) {
@@ -262,8 +369,11 @@ getTrace(const QString &name)
     if (recording_)
       traceData->startRecording();
 
-    emit traceAdded(name);
+    added = true;
   }
+
+  if (added)
+    emit traceAdded(name);
 
   return (*p).second;
 }
@@ -303,6 +413,8 @@ CQPerfTraceData(const QString &name) :
   }
 }
 
+//---
+
 void
 CQPerfTraceData::
 startTrace(int depth)
@@ -313,27 +425,32 @@ startTrace(int depth)
 
 void
 CQPerfTraceData::
-endTrace(CQPerfMonitor::TraceType traceType)
+endTrace(TraceType traceType)
 {
   // calc elapsed time
   CHRTime endTime = CHRTime::getTime();
 
   timeData_.elapsed = CHRTime::diffTime(timeData_.start, endTime);
 
-  //---
+  addTrace(timeData_, traceType);
+}
 
+void
+CQPerfTraceData::
+addTrace(const TimeData &timeData, TraceType traceType)
+{
   // update number of calls, total time, max and min time
   ++calls_;
 
-  elapsed_ += timeData_.elapsed;
+  elapsed_ += timeData.elapsed;
 
   if (elapsedMin_.isSet()) {
-    elapsedMin_ = std::min(elapsedMin_, timeData_.elapsed);
-    elapsedMax_ = std::max(elapsedMax_, timeData_.elapsed);
+    elapsedMin_ = std::min(elapsedMin_, timeData.elapsed);
+    elapsedMax_ = std::max(elapsedMax_, timeData.elapsed);
   }
   else {
-    elapsedMin_ = timeData_.elapsed;
-    elapsedMax_ = timeData_.elapsed;
+    elapsedMin_ = timeData.elapsed;
+    elapsedMax_ = timeData.elapsed;
   }
 
   //---
@@ -362,17 +479,17 @@ endTrace(CQPerfMonitor::TraceType traceType)
 
   if (windowCount > 0) {
     if (nt < windowCount)
-      times_.push_back(timeData_);
+      times_.push_back(timeData);
     else {
-      setTimeData(posEnd(), timeData_);
+      setTimeData(posEnd(), timeData);
     }
   }
   else
-    times_.push_back(timeData_);
+    times_.push_back(timeData);
 
   if (recording_) {
-    if (traceType != CQPerfMonitor::TraceType::NO_RECORD)
-      recordTimes_.push_back(timeData_);
+    if (traceType != TraceType::NO_RECORD)
+      recordTimes_.push_back(timeData);
   }
 
   //---
@@ -384,7 +501,7 @@ endTrace(CQPerfMonitor::TraceType traceType)
     for ( ; i < n; ++i) {
       int pos = fixPos(posStart_ + i);
 
-      if (timeData(pos).start >= windowTime)
+      if (this->timeData(pos).start >= windowTime)
         break;
     }
   }
@@ -397,6 +514,8 @@ endTrace(CQPerfMonitor::TraceType traceType)
   if (maxTime_.isSet() && elapsedMax_ > maxTime_)
     CQPerfMonitorInst->alert(this, CQPerfMonitor::AlertType::TIME);
 }
+
+//---
 
 void
 CQPerfTraceData::
@@ -415,21 +534,30 @@ endDebug()
 
   timeData_.elapsed = CHRTime::diffTime(timeData_.start, endTime);
 
+  addDebug(timeData_);
+}
+
+void
+CQPerfTraceData::
+addDebug(const TimeData &timeData)
+{
   if (! isEnabled() || ! CQPerfMonitorInst->isEnabled()) {
     ++calls_;
 
-    elapsed_ += timeData_.elapsed;
+    elapsed_ += timeData.elapsed;
 
     if (elapsedMin_.isSet()) {
-      elapsedMin_ = std::min(elapsedMin_, timeData_.elapsed);
-      elapsedMax_ = std::max(elapsedMax_, timeData_.elapsed);
+      elapsedMin_ = std::min(elapsedMin_, timeData.elapsed);
+      elapsedMax_ = std::max(elapsedMax_, timeData.elapsed);
     }
     else {
-      elapsedMin_ = timeData_.elapsed;
-      elapsedMax_ = timeData_.elapsed;
+      elapsedMin_ = timeData.elapsed;
+      elapsedMax_ = timeData.elapsed;
     }
   }
 }
+
+//---
 
 void
 CQPerfTraceData::
@@ -446,6 +574,8 @@ reset()
   elapsedMax_ = CHRTime();
 }
 
+//---
+
 void
 CQPerfTraceData::
 startRecording()
@@ -461,6 +591,8 @@ stopRecording()
 {
   recording_ = false;
 }
+
+//---
 
 const CHRTime &
 CQPerfTraceData::
@@ -552,6 +684,8 @@ windowDetails(const CHRTime &t1, const CHRTime &t2, TimeDatas &timeDatas) const
   }
 }
 
+//---
+
 void
 CQPerfTraceData::
 reportStats()
@@ -560,6 +694,8 @@ reportStats()
   std::cerr << "Min Time: " << elapsedMin_ << "\n";
   std::cerr << "Max Time: " << elapsedMax_ << "\n";
 }
+
+//---
 
 int
 CQPerfTraceData::

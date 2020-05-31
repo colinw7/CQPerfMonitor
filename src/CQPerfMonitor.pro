@@ -15,6 +15,7 @@ MOC_DIR = .moc
 SOURCES += \
 CQPerfMonitor.cpp \
 CQPerfGraph.cpp \
+CMessage.cpp \
 
 HEADERS += \
 ../include/CQPerfMonitor.h \
@@ -29,6 +30,7 @@ INCLUDEPATH += \
 ../include \
 ../../CQUtil/include \
 ../../CImageLib/include \
+../../CFont/include \
 ../../CFile/include \
 ../../CMath/include \
 ../../CStrUtil/include \

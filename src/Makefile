@@ -15,7 +15,7 @@ CXX           = g++
 DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -fPIC -Wall -W -D_REENTRANT $(DEFINES)
 CXXFLAGS      = -pipe -std=c++14 -O2 -fPIC -Wall -W -D_REENTRANT $(DEFINES)
-INCPATH       = -I. -I. -I../include -I../../CQUtil/include -I../../CImageLib/include -I../../CFile/include -I../../CMath/include -I../../CStrUtil/include -I../../CUtil/include -I../../COS/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I.moc -isystem /usr/include/libdrm -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
+INCPATH       = -I. -I. -I../include -I../../CQUtil/include -I../../CImageLib/include -I../../CFont/include -I../../CFile/include -I../../CMath/include -I../../CStrUtil/include -I../../CUtil/include -I../../COS/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I.moc -isystem /usr/include/libdrm -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
 QMAKE         = /usr/lib/qt5/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -48,10 +48,12 @@ OBJECTS_DIR   = ../obj/
 ####### Files
 
 SOURCES       = CQPerfMonitor.cpp \
-		CQPerfGraph.cpp .moc/moc_CQPerfMonitor.cpp \
+		CQPerfGraph.cpp \
+		CMessage.cpp .moc/moc_CQPerfMonitor.cpp \
 		.moc/moc_CQPerfGraph.cpp
 OBJECTS       = ../obj/CQPerfMonitor.o \
 		../obj/CQPerfGraph.o \
+		../obj/CMessage.o \
 		../obj/moc_CQPerfMonitor.o \
 		../obj/moc_CQPerfGraph.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -139,7 +141,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		CQPerfMonitor.pro ../include/CQPerfMonitor.h \
 		../include/CQPerfGraph.h CQPerfMonitor.cpp \
-		CQPerfGraph.cpp
+		CQPerfGraph.cpp \
+		CMessage.cpp
 QMAKE_TARGET  = CQPerfMonitor
 DESTDIR       = ../lib/
 TARGET        = libCQPerfMonitor.a
@@ -347,7 +350,7 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../include/CQPerfMonitor.h ../include/CQPerfGraph.h $(DISTDIR)/
-	$(COPY_FILE) --parents CQPerfMonitor.cpp CQPerfGraph.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents CQPerfMonitor.cpp CQPerfGraph.cpp CMessage.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -386,12 +389,12 @@ compiler_moc_header_clean:
 		../include/CQPerfMonitor.h \
 		.moc/moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include .moc/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/colinw/git/CQPerfMonitor/src -I/home/colinw/git/CQPerfMonitor/src -I/home/colinw/git/CQPerfMonitor/include -I/home/colinw/git/CQUtil/include -I/home/colinw/git/CImageLib/include -I/home/colinw/git/CFile/include -I/home/colinw/git/CMath/include -I/home/colinw/git/CStrUtil/include -I/home/colinw/git/CUtil/include -I/home/colinw/git/COS/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../include/CQPerfMonitor.h -o .moc/moc_CQPerfMonitor.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include .moc/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/colinw/git/CQPerfMonitor/src -I/home/colinw/git/CQPerfMonitor/src -I/home/colinw/git/CQPerfMonitor/include -I/home/colinw/git/CQUtil/include -I/home/colinw/git/CImageLib/include -I/home/colinw/git/CFont/include -I/home/colinw/git/CFile/include -I/home/colinw/git/CMath/include -I/home/colinw/git/CStrUtil/include -I/home/colinw/git/CUtil/include -I/home/colinw/git/COS/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../include/CQPerfMonitor.h -o .moc/moc_CQPerfMonitor.cpp
 
 .moc/moc_CQPerfGraph.cpp: ../include/CQPerfGraph.h \
 		.moc/moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include .moc/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/colinw/git/CQPerfMonitor/src -I/home/colinw/git/CQPerfMonitor/src -I/home/colinw/git/CQPerfMonitor/include -I/home/colinw/git/CQUtil/include -I/home/colinw/git/CImageLib/include -I/home/colinw/git/CFile/include -I/home/colinw/git/CMath/include -I/home/colinw/git/CStrUtil/include -I/home/colinw/git/CUtil/include -I/home/colinw/git/COS/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../include/CQPerfGraph.h -o .moc/moc_CQPerfGraph.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include .moc/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/colinw/git/CQPerfMonitor/src -I/home/colinw/git/CQPerfMonitor/src -I/home/colinw/git/CQPerfMonitor/include -I/home/colinw/git/CQUtil/include -I/home/colinw/git/CImageLib/include -I/home/colinw/git/CFont/include -I/home/colinw/git/CFile/include -I/home/colinw/git/CMath/include -I/home/colinw/git/CStrUtil/include -I/home/colinw/git/CUtil/include -I/home/colinw/git/COS/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../include/CQPerfGraph.h -o .moc/moc_CQPerfGraph.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -409,6 +412,7 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 
 ../obj/CQPerfMonitor.o: CQPerfMonitor.cpp ../include/CQPerfMonitor.h \
 		../../COS/include/CHRTime.h \
+		../include/CMessage.h \
 		../../CUtil/include/CEnv.h \
 		../../CUtil/include/CRefPtr.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ../obj/CQPerfMonitor.o CQPerfMonitor.cpp
@@ -416,37 +420,71 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 ../obj/CQPerfGraph.o: CQPerfGraph.cpp ../include/CQPerfGraph.h \
 		../include/CQPerfMonitor.h \
 		../../COS/include/CHRTime.h \
-		../../CUtil/include/CInterval.h \
-		../../CQUtil/include/CQImageButton.h \
-		../../CImageLib/include/CImageLib.h \
-		../../CUtil/include/CAlignType.h \
+		../../CQUtil/include/CQTabSplit.h \
+		../../CQUtil/include/CQUtil.h \
+		../../CUtil/include/CEvent.h \
+		../../CMath/include/CIPoint2D.h \
+		../../CUtil/include/CKeyType.h \
 		../../CUtil/include/CRGBA.h \
 		../../CUtil/include/CRGB.h \
 		../../CUtil/include/CRGBName.h \
+		../../CUtil/include/CLineDash.h \
+		../../CUtil/include/CILineDash.h \
+		../../CMath/include/CAngle.h \
+		../../CFont/include/CFontStyle.h \
+		../../CUtil/include/CFlags.h \
+		../../CUtil/include/CLineCapType.h \
+		../../CUtil/include/CLineJoinType.h \
+		../../CMath/include/CIBBox2D.h \
+		../../CMath/include/CISize2D.h \
+		../../CMath/include/CIVector2D.h \
+		../../CMath/include/CMathGen.h \
+		../../CFont/include/CFont.h \
+		../../CFont/include/CFontPtr.h \
+		../../CUtil/include/CRefPtr.h \
+		../../CImageLib/include/CImagePtr.h \
+		../../CMath/include/CPoint2D.h \
+		../../CMath/include/CBBox2D.h \
+		../../CMath/include/CVector2D.h \
+		../../CMath/include/CMathUtil.h \
+		../../COS/include/COSNaN.h \
+		../../CMath/include/CSize2D.h \
+		../../CMath/include/CMatrix2D.h \
+		../../CUtil/include/CBrush.h \
+		../../CUtil/include/CBrushStyle.h \
+		../../CUtil/include/CFillType.h \
+		../../CImageLib/include/CImageLib.h \
+		../../CUtil/include/CAlignType.h \
 		../../CImageLib/include/CImageState.h \
 		../../CImageLib/include/CImage.h \
 		../../CUtil/include/CRGBACombineDef.h \
-		../../CMath/include/CISize2D.h \
-		../../CMath/include/CIBBox2D.h \
-		../../CMath/include/CIPoint2D.h \
-		../../CMath/include/CIVector2D.h \
-		../../CMath/include/CMathGen.h \
 		../../CFile/include/CFileType.h \
 		../../CUtil/include/COptVal.h \
-		../../CImageLib/include/CImagePtr.h \
-		../../CUtil/include/CRefPtr.h \
 		../../CImageLib/include/CImageMgr.h \
 		../../CFile/include/CFile.h \
 		../../CFile/include/CFileBase.h \
 		../../CStrUtil/include/CStrUtil.h \
 		../../CImageLib/include/CImageAnim.h \
 		../../CImageLib/include/CImageFile.h \
+		../../CMath/include/CGenGradient.h \
+		../../CUtil/include/CPen.h \
+		../../CQUtil/include/CQUtilMeta.h \
+		../../CUtil/include/CInterval.h \
+		../../CQUtil/include/CQImageButton.h \
 		../../CQUtil/include/CQPixmapCache.h \
 		svg/record_svg.h \
 		svg/stop_svg.h \
 		svg/zoom_out_svg.h \
 		svg/zoom_in_svg.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ../obj/CQPerfGraph.o CQPerfGraph.cpp
+
+../obj/CMessage.o: CMessage.cpp ../include/CMessage.h \
+		../../CFile/include/CFile.h \
+		../../CFile/include/CFileBase.h \
+		../../CFile/include/CFileType.h \
+		../../CStrUtil/include/CStrUtil.h \
+		../../COS/include/COSTimer.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ../obj/CMessage.o CMessage.cpp
 
 ../obj/moc_CQPerfMonitor.o: .moc/moc_CQPerfMonitor.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ../obj/moc_CQPerfMonitor.o .moc/moc_CQPerfMonitor.cpp

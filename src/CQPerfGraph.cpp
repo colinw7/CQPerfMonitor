@@ -1,12 +1,13 @@
 #include <CQPerfGraph.h>
 #include <CQPerfMonitor.h>
+#include <CQTabSplit.h>
+#include <CQUtil.h>
 #include <CInterval.h>
 
 #include <CQImageButton.h>
 #include <CQPixmapCache.h>
 
 #include <QHeaderView>
-#include <QSplitter>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QSpinBox>
@@ -178,9 +179,8 @@ CQPerfDialog(QWidget *parent) :
 
   //----
 
-  QSplitter *splitter = new QSplitter;
+  auto *splitter = CQUtil::makeWidget<CQTabSplit>("splitter");
 
-  splitter->setObjectName("splitter");
   splitter->setOrientation(Qt::Vertical);
 
   layout->addWidget(splitter);
@@ -193,13 +193,11 @@ CQPerfDialog(QWidget *parent) :
   QVBoxLayout *graphLayout = new QVBoxLayout(graphFrame);
   graphLayout->setMargin(0); graphLayout->setSpacing(0);
 
-  splitter->addWidget(graphFrame);
+  splitter->addWidget(graphFrame, "Graph");
 
   //--
 
   graph_ = new CQPerfGraph(this);
-
-  splitter->addWidget(graph_);
 
   graphLayout->addWidget(graph_);
 
@@ -250,7 +248,7 @@ CQPerfDialog(QWidget *parent) :
 
   list_ = new CQPerfList(this);
 
-  splitter->addWidget(list_);
+  splitter->addWidget(list_, "List");
 
   connect(list_, SIGNAL(nameSelected(const QString &)),
           this, SLOT(setName(const QString &)));

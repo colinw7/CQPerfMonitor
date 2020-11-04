@@ -1,5 +1,9 @@
 #include <CQPerfMonitor.h>
+
+#ifdef CQPERF_MESSAGE
 #include <CMessage.h>
+#endif
+
 #include <CEnv.h>
 
 #include <QTimer>
@@ -14,7 +18,9 @@ CQPerfMonitor()
 CQPerfMonitor::
 ~CQPerfMonitor()
 {
+#ifdef CQPERF_MESSAGE
   delete message_;
+#endif
 }
 
 //---
@@ -43,6 +49,7 @@ void
 CQPerfMonitor::
 createServer(const QString &name)
 {
+#ifdef CQPERF_MESSAGE
   std::string msgName = "CQ_PERF_MONITOR";
 
   if (name != "")
@@ -57,13 +64,17 @@ createServer(const QString &name)
 
   connect(serverTimer_, SIGNAL(timeout()), this, SLOT(serverSlot()));
 
-  serverTimer_->start(100);
+  serverTimer_->start(5);
+#else
+  std::cerr << "No server support for " << name.toStdString() << "\n";
+#endif
 }
 
 void
 CQPerfMonitor::
 createClient(const QString &name)
 {
+#ifdef CQPERF_MESSAGE
   std::string msgName = "CQ_PERF_MONITOR";
 
   if (name != "")
@@ -73,12 +84,22 @@ createClient(const QString &name)
 
   message_ = new CMessage(msgName);
   server_  = false;
+
+  clientTimer_ = new QTimer(this);
+
+  connect(clientTimer_, SIGNAL(timeout()), this, SLOT(clientSlot()));
+
+  clientTimer_->start(5);
+#else
+  std::cerr << "No client support for " << name.toStdString() << "\n";
+#endif
 }
 
 void
 CQPerfMonitor::
 serverSlot()
 {
+#ifdef CQPERF_MESSAGE
   std::string msg;
 
   if (message_->recvClientMessage(msg)) {
@@ -87,6 +108,16 @@ serverSlot()
     else if (msg[0] == '<')
       endTrace(QString(msg.substr(1).c_str()));
   }
+#endif
+}
+
+void
+CQPerfMonitor::
+clientSlot()
+{
+#ifdef CQPERF_MESSAGE
+  message_->sendClientPending();
+#endif
 }
 
 //---
@@ -95,8 +126,10 @@ void
 CQPerfMonitor::
 startTrace(const QString &name, TraceType)
 {
+#ifdef CQPERF_MESSAGE
   if (message_ && ! server_)
     message_->sendClientMessage(">" + name.toStdString());
+#endif
 
   CQPerfTraceData *data = getTrace(name);
 
@@ -113,8 +146,10 @@ void
 CQPerfMonitor::
 endTrace(const QString &name, TraceType traceType)
 {
+#ifdef CQPERF_MESSAGE
   if (message_ && ! server_)
     message_->sendClientMessage("<" + name.toStdString());
+#endif
 
   CQPerfTraceData *data = getTrace(name);
 

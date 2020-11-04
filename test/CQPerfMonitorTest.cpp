@@ -11,8 +11,9 @@ main(int argc, char **argv)
 {
   CQApp app(argc, argv);
 
-  bool server = false;
-  bool client = false;
+  bool    server = false;
+  bool    client = false;
+  QString id;
 
   for (int i = 1; i < argc; ++i) {
     if (argv[i][0] == '-') {
@@ -22,6 +23,12 @@ main(int argc, char **argv)
         server = true;
       else if (arg == "client")
         client = true;
+      else if (arg == "id") {
+        ++i;
+
+        if (i < argc)
+          id = argv[i];
+      }
       else
         std::cerr << "Invalid option '" << arg << "'\n";
     }
@@ -32,16 +39,20 @@ main(int argc, char **argv)
 
   //---
 
-  if      (server)
-    CQPerfMonitorInst->createServer();
+  if      (server) {
+    CQPerfMonitorInst->createServer(id);
+
+    CQApp::showPerfDialog();
+  }
   else if (client)
-    CQPerfMonitorInst->createClient();
+    CQPerfMonitorInst->createClient(id);
 
   //---
 
   CQPerfMonitorTest test(server);
 
-  test.show();
+  if (! server)
+    test.show();
 
   app.exec();
 

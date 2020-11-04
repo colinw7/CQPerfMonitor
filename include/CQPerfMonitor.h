@@ -12,7 +12,10 @@
 
 class CQPerfTraceData;
 class QTimer;
+
+#ifdef CQPERF_MESSAGE
 class CMessage;
+#endif
 
 #define CQPerfMonitorInst CQPerfMonitor::getInstance()
 
@@ -119,6 +122,7 @@ class CQPerfMonitor : public QObject {
 
  private slots:
   void serverSlot();
+  void clientSlot();
 
  private:
   CQPerfMonitor();
@@ -135,9 +139,13 @@ class CQPerfMonitor : public QObject {
   int                numTrace_    { 0 };     //!< number of active traces
   int                numDebug_    { 0 };     //!< number of active debugs
   mutable std::mutex mutex_;                 //!< update mutex
+
+#ifdef CQPERF_MESSAGE
   CMessage*          message_     { nullptr };
   QTimer*            serverTimer_ { nullptr };
+  QTimer*            clientTimer_ { nullptr };
   bool               server_      { false };
+#endif
 };
 
 //---

@@ -107,9 +107,9 @@ class CQPerfGraph : public QFrame {
   double zoomOffset() const { return zoomOffset_; }
   void setZoomOffset(double r) { zoomOffset_ = r; }
 
-  void contextMenuEvent(QContextMenuEvent *event);
+  void contextMenuEvent(QContextMenuEvent *event) override;
 
-  void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *) override;
 
   void drawIntervalGraph(QPainter *p);
   void drawDepthGraph   (QPainter *p);
@@ -122,9 +122,9 @@ class CQPerfGraph : public QFrame {
   void zoomOut();
   void zoomIn();
 
-  bool event(QEvent *e);
+  bool event(QEvent *e) override;
 
-  QSize sizeHint() const { return QSize(600, 400); }
+  QSize sizeHint() const override { return QSize(600, 400); }
 
  public slots:
   void setWindowSize(int i) { windowSize_ = i; }
@@ -196,7 +196,7 @@ class CQPerfList : public QTableWidget {
   bool isSingleSelect() const { return singleSelect_; }
   void setSingleSelect(bool b) { singleSelect_ = b; }
 
-  QSize sizeHint() const { return QSize(600, 400); }
+  QSize sizeHint() const override { return QSize(600, 400); }
 
  signals:
   void nameSelected(const QString &name);

@@ -464,10 +464,6 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 		../../CMath/include/CISize2D.h \
 		../../CMath/include/CIVector2D.h \
 		../../CMath/include/CMathGen.h \
-		../../CFont/include/CFont.h \
-		../../CFont/include/CFontPtr.h \
-		../../CUtil/include/CRefPtr.h \
-		../../CImageLib/include/CImagePtr.h \
 		../../CMath/include/CPoint2D.h \
 		../../CMath/include/CBBox2D.h \
 		../../CMath/include/CVector2D.h \
@@ -475,27 +471,24 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 		../../COS/include/COSNaN.h \
 		../../CMath/include/CSize2D.h \
 		../../CMath/include/CMatrix2D.h \
-		../../CUtil/include/CBrush.h \
-		../../CUtil/include/CBrushStyle.h \
-		../../CUtil/include/CFillType.h \
-		../../CImageLib/include/CImageLib.h \
 		../../CUtil/include/CAlignType.h \
+		../../CQUtil/include/CQUtilMeta.h \
+		../../CUtil/include/CInterval.h \
+		../../CQUtil/include/CQImageButton.h \
+		../../CImageLib/include/CImageLib.h \
 		../../CImageLib/include/CImageState.h \
 		../../CImageLib/include/CImage.h \
 		../../CUtil/include/CRGBACombineDef.h \
 		../../CFile/include/CFileType.h \
 		../../CUtil/include/COptVal.h \
+		../../CImageLib/include/CImagePtr.h \
+		../../CUtil/include/CRefPtr.h \
 		../../CImageLib/include/CImageMgr.h \
 		../../CFile/include/CFile.h \
 		../../CFile/include/CFileBase.h \
 		../../CStrUtil/include/CStrUtil.h \
 		../../CImageLib/include/CImageAnim.h \
 		../../CImageLib/include/CImageFile.h \
-		../../CMath/include/CGenGradient.h \
-		../../CUtil/include/CPen.h \
-		../../CQUtil/include/CQUtilMeta.h \
-		../../CUtil/include/CInterval.h \
-		../../CQUtil/include/CQImageButton.h \
 		../../CQUtil/include/CQPixmapCache.h \
 		svg/record_svg.h \
 		svg/stop_svg.h \

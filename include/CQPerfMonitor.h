@@ -78,6 +78,11 @@ class CQPerfMonitor : public QObject {
   const CHRTime &windowTime() const { return windowTime_; }
   void setWindowTime(const CHRTime &v) { windowTime_ = v; }
 
+  int minTime() const { return minTime_; }
+  void setMinTime(int i) { minTime_ = i; }
+
+  //---
+
   void startTrace(const QString &name, TraceType traceType=TraceType::ALL);
   void endTrace  (const QString &name, TraceType traceType=TraceType::ALL);
   void addTrace  (const QString &name, const TimeData &timeData,
@@ -128,7 +133,8 @@ class CQPerfMonitor : public QObject {
   CQPerfMonitor();
 
  private:
-  using Traces = std::map<QString,CQPerfTraceData *>;
+  using Traces = std::map<QString, CQPerfTraceData *>;
+  using Names  = std::vector<QString>;
 
   bool               enabled_     { false }; //!< is trace enabled
   bool               debug_       { false }; //!< is debug enabled
@@ -138,6 +144,8 @@ class CQPerfMonitor : public QObject {
   CHRTime            windowTime_;            //!< time span for history
   int                numTrace_    { 0 };     //!< number of active traces
   int                numDebug_    { 0 };     //!< number of active debugs
+  int                minTime_     { - 1 };   //!< minimum debug time
+  Names              names_;                 //!< buffered names
   mutable std::mutex mutex_;                 //!< update mutex
 
 #ifdef CQPERF_MESSAGE

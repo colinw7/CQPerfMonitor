@@ -11,8 +11,9 @@
 CQPerfMonitor::
 CQPerfMonitor()
 {
-  CEnvInst.get("CQ_PERF_MONITOR_ENABLED", enabled_);
-  CEnvInst.get("CQ_PERF_MONITOR_DEBUG"  , debug_  );
+  CEnvInst.get("CQ_PERF_MONITOR_ENABLED" , enabled_);
+  CEnvInst.get("CQ_PERF_MONITOR_DEBUG"   , debug_  );
+  CEnvInst.get("CQ_PERF_MONITOR_MIN_TIME", minTime_);
 }
 
 CQPerfMonitor::
@@ -131,7 +132,7 @@ startTrace(const QString &name, TraceType)
     message_->sendClientMessage(">" + name.toStdString());
 #endif
 
-  CQPerfTraceData *data = getTrace(name);
+  auto *data = getTrace(name);
 
   if (data->isEnabled()) {
     std::unique_lock<std::mutex> lock(mutex_);
@@ -151,7 +152,7 @@ endTrace(const QString &name, TraceType traceType)
     message_->sendClientMessage("<" + name.toStdString());
 #endif
 
-  CQPerfTraceData *data = getTrace(name);
+  auto *data = getTrace(name);
 
   if (data->isEnabled()) {
     std::unique_lock<std::mutex> lock(mutex_);
@@ -166,7 +167,7 @@ void
 CQPerfMonitor::
 addTrace(const QString &name, const TimeData &timeData, TraceType traceType)
 {
-  CQPerfTraceData *data = getTrace(name);
+  auto *data = getTrace(name);
 
   if (data->isEnabled()) {
     std::unique_lock<std::mutex> lock(mutex_);
@@ -181,16 +182,21 @@ void
 CQPerfMonitor::
 startDebug(const QString &name)
 {
-  CQPerfTraceData *data = getTrace(name);
+  auto *data = getTrace(name);
 
   if (data->isDebug()) {
     std::unique_lock<std::mutex> lock(mutex_);
 
     ++numDebug_;
 
-    QString msg = QString(">%1%2").arg(" ", numDebug_).arg(name);
+    if (minTime() > 0) {
+      names_.push_back(name);
+    }
+    else {
+      auto msg = QString(">%1%2").arg(" ", numDebug_).arg(name);
 
-    std::cerr << msg.toStdString() << "\n";
+      std::cerr << msg.toStdString() << "\n";
+    }
 
     data->startDebug();
   }
@@ -200,7 +206,7 @@ void
 CQPerfMonitor::
 endDebug(const QString &name)
 {
-  CQPerfTraceData *data = getTrace(name);
+  auto *data = getTrace(name);
 
   if (data->isDebug()) {
     std::unique_lock<std::mutex> lock(mutex_);
@@ -209,9 +215,45 @@ endDebug(const QString &name)
 
     const CHRTime &e = data->elapsedTime();
 
-    QString msg = QString("<%1%2 %3").arg(" ", numDebug_).arg(name).arg(e.getSecs(), 0, 'f', 6);
+    if (minTime() > 0) {
+      if (e.getMSecs() >= minTime()) {
+        int n = names_.size();
 
-    std::cerr << msg.toStdString() << "\n";
+        int nd = numDebug_ - n + 1;
+
+        for (int i = 0; i < n; ++i) {
+          const auto &name = names_[i];
+
+          auto smsg = QString(">%1%2").arg(" ", nd).arg(name);
+
+          std::cerr << smsg.toStdString() << "\n";
+
+          ++nd;
+        }
+
+        --nd;
+
+        for (int i = n - 1; i >= 0; --i) {
+          const auto &name = names_[i];
+
+          auto emsg = QString("<%1%2 %3").arg(" ", nd).arg(name).arg(e.getSecs(), 0, 'f', 6);
+
+          std::cerr << emsg.toStdString() << "\n";
+
+          --nd;
+        }
+
+        names_.clear();
+      }
+      else {
+        names_.pop_back();
+      }
+    }
+    else {
+      auto msg = QString("<%1%2 %3").arg(" ", numDebug_).arg(name).arg(e.getSecs(), 0, 'f', 6);
+
+      std::cerr << msg.toStdString() << "\n";
+    }
 
     --numDebug_;
   }
@@ -221,7 +263,7 @@ void
 CQPerfMonitor::
 addDebug(const QString &name, const TimeData &timeData)
 {
-  CQPerfTraceData *data = getTrace(name);
+  auto *data = getTrace(name);
 
   if (data->isDebug()) {
     std::unique_lock<std::mutex> lock(mutex_);
@@ -230,7 +272,7 @@ addDebug(const QString &name, const TimeData &timeData)
 
     const CHRTime &e = timeData.elapsed;
 
-    QString msg = QString("%1%2 %3").arg(" ", numDebug_).arg(name).arg(e.getSecs(), 0, 'f', 6);
+    auto msg = QString("%1%2 %3").arg(" ", numDebug_).arg(name).arg(e.getSecs(), 0, 'f', 6);
 
     std::cerr << msg.toStdString() << "\n";
   }
@@ -240,7 +282,7 @@ void
 CQPerfMonitor::
 resetTrace(const QString &name)
 {
-  CQPerfTraceData *data = getTrace(name);
+  auto *data = getTrace(name);
 
   std::unique_lock<std::mutex> lock(mutex_);
 
@@ -297,7 +339,7 @@ bool
 CQPerfMonitor::
 isTraceEnabled(const QString &name) const
 {
-  CQPerfTraceData *data = const_cast<CQPerfMonitor *>(this)->getTrace(name);
+  auto *data = const_cast<CQPerfMonitor *>(this)->getTrace(name);
 
   return data->isEnabled();
 }
@@ -306,7 +348,7 @@ void
 CQPerfMonitor::
 setTraceEnabled(const QString &name, bool enabled)
 {
-  CQPerfTraceData *data = getTrace(name);
+  auto *data = getTrace(name);
 
   std::unique_lock<std::mutex> lock(mutex_);
 
@@ -317,7 +359,7 @@ bool
 CQPerfMonitor::
 isTraceDebug(const QString &name) const
 {
-  CQPerfTraceData *data = const_cast<CQPerfMonitor *>(this)->getTrace(name);
+  auto *data = const_cast<CQPerfMonitor *>(this)->getTrace(name);
 
   return data->isDebug();
 }
@@ -326,7 +368,7 @@ void
 CQPerfMonitor::
 setTraceDebug(const QString &name, bool debug)
 {
-  CQPerfTraceData *data = getTrace(name);
+  auto *data = getTrace(name);
 
   std::unique_lock<std::mutex> lock(mutex_);
 
@@ -337,7 +379,7 @@ void
 CQPerfMonitor::
 setTraceMaxTime(const QString &name, const CHRTime &t)
 {
-  CQPerfTraceData *data = getTrace(name);
+  auto *data = getTrace(name);
 
   std::unique_lock<std::mutex> lock(mutex_);
 
@@ -348,7 +390,7 @@ void
 CQPerfMonitor::
 setTraceMaxCalls(const QString &name, int n)
 {
-  CQPerfTraceData *data = getTrace(name);
+  auto *data = getTrace(name);
 
   std::unique_lock<std::mutex> lock(mutex_);
 
@@ -359,7 +401,7 @@ void
 CQPerfMonitor::
 reportStats(const QString &name) const
 {
-  CQPerfTraceData *data = const_cast<CQPerfMonitor *>(this)->getTrace(name);
+  auto *data = const_cast<CQPerfMonitor *>(this)->getTrace(name);
 
   data->reportStats();
 }
@@ -397,7 +439,7 @@ getTrace(const QString &name)
   if (p == traces_.end()) {
     std::unique_lock<std::mutex> lock(mutex_);
 
-    CQPerfTraceData *traceData = new CQPerfTraceData(name);
+    auto *traceData = new CQPerfTraceData(name);
 
     p = traces_.insert(p, Traces::value_type(name, traceData));
 
@@ -436,7 +478,10 @@ CQPerfTraceData(const QString &name) :
 
   CEnvInst.get("CQ_PERF_MONITOR_DEBUG_PATTERN", pattern);
 
-  QStringList patterns = QString(pattern.c_str()).split("|", QString::SkipEmptyParts);
+  if (pattern.empty())
+    pattern = "*";
+
+  auto patterns = QString(pattern.c_str()).split("|", QString::SkipEmptyParts);
 
   for (int i = 0; i < patterns.length(); ++i) {
     QRegExp regexp(patterns[i], Qt::CaseSensitive, QRegExp::WildcardUnix);

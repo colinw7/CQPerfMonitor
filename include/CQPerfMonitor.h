@@ -120,6 +120,8 @@ class CQPerfMonitor : public QObject {
 
   void alert(const CQPerfTraceData *trace, CQPerfMonitor::AlertType type);
 
+  void log(const QString &msg) const;
+
  signals:
   void stateChanged();
 
@@ -134,7 +136,15 @@ class CQPerfMonitor : public QObject {
 
  private:
   using Traces = std::map<QString, CQPerfTraceData *>;
-  using Names  = std::vector<QString>;
+
+  struct NameData {
+    QString name;
+    bool    flushed { false };
+
+    NameData(const QString &name) : name(name) { }
+  };
+
+  using Names = std::vector<NameData>;
 
   bool               enabled_     { false }; //!< is trace enabled
   bool               debug_       { false }; //!< is debug enabled

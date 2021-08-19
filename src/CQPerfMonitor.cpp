@@ -190,12 +190,12 @@ startDebug(const QString &name)
     ++numDebug_;
 
     if (minTime() > 0) {
-      names_.push_back(name);
+      names_.emplace_back(name);
     }
     else {
       auto msg = QString(">%1%2").arg(" ", numDebug_).arg(name);
 
-      std::cerr << msg.toStdString() << "\n";
+      log(msg);
     }
 
     data->startDebug();
@@ -213,46 +213,53 @@ endDebug(const QString &name)
 
     data->endDebug();
 
-    const CHRTime &e = data->elapsedTime();
+    const auto &e = data->elapsedTime();
 
     if (minTime() > 0) {
+      // if longer than elapsed flush stack
       if (e.getMSecs() >= minTime()) {
-        int n = names_.size();
-
+        int n  = names_.size();
         int nd = numDebug_ - n + 1;
 
+        // show unflushed start names
         for (int i = 0; i < n; ++i) {
-          const auto &name = names_[i];
+          auto &nameData = names_[i];
 
-          auto smsg = QString(">%1%2").arg(" ", nd).arg(name);
+          if (! nameData.flushed) {
+            auto smsg = QString(">%1%2").arg(" ", nd).arg(nameData.name);
 
-          std::cerr << smsg.toStdString() << "\n";
+            log(smsg);
+
+            nameData.flushed = true;
+          }
 
           ++nd;
         }
 
         --nd;
 
-        for (int i = n - 1; i >= 0; --i) {
-          const auto &name = names_[i];
+        // show end name
+        if (n > 0) {
+          const auto &nameData = names_[n - 1];
 
-          auto emsg = QString("<%1%2 %3").arg(" ", nd).arg(name).arg(e.getSecs(), 0, 'f', 6);
+          auto emsg = QString("<%1%2 %3").arg(" ", nd).
+                        arg(nameData.name).arg(e.getSecs(), 0, 'f', 6);
 
-          std::cerr << emsg.toStdString() << "\n";
+          log(emsg);
 
-          --nd;
+          names_.pop_back();
         }
-
-        names_.clear();
       }
+      // skip if less than elapsed
       else {
-        names_.pop_back();
+        if (! names_.empty())
+          names_.pop_back();
       }
     }
     else {
       auto msg = QString("<%1%2 %3").arg(" ", numDebug_).arg(name).arg(e.getSecs(), 0, 'f', 6);
 
-      std::cerr << msg.toStdString() << "\n";
+      log(msg);
     }
 
     --numDebug_;
@@ -274,7 +281,7 @@ addDebug(const QString &name, const TimeData &timeData)
 
     auto msg = QString("%1%2 %3").arg(" ", numDebug_).arg(name).arg(e.getSecs(), 0, 'f', 6);
 
-    std::cerr << msg.toStdString() << "\n";
+    log(msg);
   }
 }
 
@@ -466,6 +473,14 @@ alert(const CQPerfTraceData *trace, CQPerfMonitor::AlertType type)
   std::cerr << "\n";
 
   assert(false);
+}
+
+void
+CQPerfMonitor::
+log(const QString &msg) const
+{
+  // TODO: log file
+  std::cerr << msg.toStdString() << "\n";
 }
 
 //---

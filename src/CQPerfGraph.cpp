@@ -21,10 +21,10 @@
 #include <QAction>
 #include <QToolTip>
 
-#include <svg/record_svg.h>
-#include <svg/stop_svg.h>
-#include <svg/zoom_out_svg.h>
-#include <svg/zoom_in_svg.h>
+#include <svg/perf_record_svg.h>
+#include <svg/perf_stop_svg.h>
+#include <svg/perf_zoom_out_svg.h>
+#include <svg/perf_zoom_in_svg.h>
 
 namespace {
 
@@ -161,11 +161,11 @@ CQPerfDialog(QWidget *parent) :
 
   //---
 
-  recordButton_ = new CQImageButton(CQPixmapCacheInst->getIcon("RECORD"));
+  recordButton_ = new CQImageButton(CQPixmapCacheInst->getIcon("PERF_RECORD"));
   recordButton_->setObjectName("recordButton");
 
   if (CQPerfMonitorInst->isRecording())
-    recordButton_->setIcon(CQPixmapCacheInst->getIcon("STOP"));
+    recordButton_->setIcon(CQPixmapCacheInst->getIcon("PERF_STOP"));
 
   connect(recordButton_, SIGNAL(clicked()), this, SLOT(recordSlot()));
 
@@ -215,7 +215,7 @@ CQPerfDialog(QWidget *parent) :
   QHBoxLayout *scrollLayout = new QHBoxLayout(scrollFrame);
   scrollLayout->setMargin(2); scrollLayout->setSpacing(2);
 
-  CQImageButton *zoomOutButton = new CQImageButton(CQPixmapCacheInst->getIcon("ZOOM_OUT"));
+  CQImageButton *zoomOutButton = new CQImageButton(CQPixmapCacheInst->getIcon("PERF_ZOOM_OUT"));
   zoomOutButton->setObjectName("zoomOutButton");
 
   connect(zoomOutButton, SIGNAL(clicked()), this, SLOT(zoomOutSlot()));
@@ -232,7 +232,7 @@ CQPerfDialog(QWidget *parent) :
 
   scrollLayout->addWidget(graphScroll_);
 
-  CQImageButton *zoomInButton  = new CQImageButton(CQPixmapCacheInst->getIcon("ZOOM_IN"));
+  CQImageButton *zoomInButton  = new CQImageButton(CQPixmapCacheInst->getIcon("PERF_ZOOM_IN"));
   zoomInButton->setObjectName("zoomInButton");
 
   connect(zoomInButton, SIGNAL(clicked()), this, SLOT(zoomInSlot()));
@@ -426,10 +426,10 @@ recordSlot()
   if (! CQPerfMonitorInst->isRecording()) {
     CQPerfMonitorInst->startRecording();
 
-    recordButton_->setIcon(CQPixmapCacheInst->getIcon("STOP"));
+    recordButton_->setIcon(CQPixmapCacheInst->getIcon("PERF_STOP"));
   }
   else {
-    recordButton_->setIcon(CQPixmapCacheInst->getIcon("RECORD"));
+    recordButton_->setIcon(CQPixmapCacheInst->getIcon("PERF_RECORD"));
 
     CQPerfMonitorInst->stopRecording();
   }

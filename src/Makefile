@@ -493,10 +493,10 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 		../../CImageLib/include/CImageAnim.h \
 		../../CImageLib/include/CImageFile.h \
 		../../CQUtil/include/CQPixmapCache.h \
-		svg/record_svg.h \
-		svg/stop_svg.h \
-		svg/zoom_out_svg.h \
-		svg/zoom_in_svg.h
+		svg/perf_record_svg.h \
+		svg/perf_stop_svg.h \
+		svg/perf_zoom_out_svg.h \
+		svg/perf_zoom_in_svg.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ../obj/CQPerfGraph.o CQPerfGraph.cpp
 
 ../obj/CMessage.o: CMessage.cpp ../include/CMessage.h \

@@ -609,7 +609,7 @@ drawIntervalGraph(QPainter *p)
 
   //---
 
-  int nb = numIntervals();
+  uint nb = uint(numIntervals());
 
   double dt = (xmax_ - xmin_)/nb;
 
@@ -631,7 +631,7 @@ drawIntervalGraph(QPainter *p)
       maxElapsed = std::max(maxElapsed, windowData.elapsed.getUSecs());
     }
     else {
-      for (int j = 0; j < nb; ++j) {
+      for (uint j = 0; j < nb; ++j) {
         // get step time range
         double tt1 = xmin_ + j*dt;
         double tt2 = tt1 + dt;
@@ -742,7 +742,7 @@ drawIntervalGraph(QPainter *p)
 
   double tx = width()/2 - fm.width(title)/2;
 
-  p->drawText(tx, fa + 2, title);
+  p->drawText(int(tx), fa + 2, title);
 
   //---
 
@@ -751,7 +751,7 @@ drawIntervalGraph(QPainter *p)
 
   tx = width()/2 - fm.width(xlabel)/2;
 
-  p->drawText(tx, height() - fm.descent() - 2, xlabel);
+  p->drawText(int(tx), height() - fm.descent() - 2, xlabel);
 
   //---
 
@@ -764,12 +764,12 @@ drawIntervalGraph(QPainter *p)
 
   TraceDrawDatas traceDrawDatas;
 
-  traceDrawDatas.resize(names_.size());
+  traceDrawDatas.resize(uint(names_.size()));
 
   //---
 
-  for (int i = 0; i < names_.length(); ++i) {
-    CQPerfTraceData *trace = CQPerfMonitorInst->getTrace(names_[i]);
+  for (uint i = 0; i < uint(names_.length()); ++i) {
+    auto *trace = CQPerfMonitorInst->getTrace(names_[int(i)]);
 
     //---
 
@@ -787,7 +787,7 @@ drawIntervalGraph(QPainter *p)
 
     //---
 
-    for (int j = 0; j < nb; ++j) {
+    for (uint j = 0; j < nb; ++j) {
       // get step time range
       double tt1 = xmin_ + j*dt;
       double tt2 = tt1 + dt;
@@ -832,7 +832,7 @@ drawIntervalGraph(QPainter *p)
 
   p->setClipRect(irect);
 
-  for (int i = 0; i < names_.length(); ++i) {
+  for (uint i = 0; i < uint(names_.length()); ++i) {
     TraceDrawData &traceDrawData = traceDrawDatas[i];
 
     // draw rects
@@ -848,7 +848,7 @@ drawIntervalGraph(QPainter *p)
           countToPixel(r1.left (), r1.bottom(), px1, py1);
           countToPixel(r1.right(), r1.top   (), px2, py2);
 
-          QColor c1 = bgColor(i); c1.setAlphaF(0.5);
+          QColor c1 = bgColor(int(i)); c1.setAlphaF(0.5);
           p->setBrush(c1);
 
           p->drawRect(QRectF(px1, py1, px2 - px1, py2 - py1));
@@ -862,7 +862,7 @@ drawIntervalGraph(QPainter *p)
           elapsedToPixel(r2.left (), r2.bottom(), px1, py1);
           elapsedToPixel(r2.right(), r2.top   (), px2, py2);
 
-          QColor c2 = bgColor(i + 8); c2.setAlphaF(0.5);
+          QColor c2 = bgColor(int(i + 8)); c2.setAlphaF(0.5);
           p->setBrush(c2);
 
           p->drawRect(QRectF(px1, py1, px2 - px1, py2 - py1));
@@ -892,7 +892,7 @@ drawIntervalGraph(QPainter *p)
           ++i1;
         }
 
-        QColor c1 = bgColor(i);
+        QColor c1 = bgColor(int(i));
 
         QPen pen1(c1);
 
@@ -919,7 +919,7 @@ drawIntervalGraph(QPainter *p)
           ++i2;
         }
 
-        QColor c2 = bgColor(i + 8);
+        QColor c2 = bgColor(int(i + 8));
 
         QPen pen2(c2);
 
@@ -948,7 +948,7 @@ drawDepthGraph(QPainter *p)
   //---
 
   // get max depth
-  int maxDepth = 0;
+  uint maxDepth = 0;
 
   for (int i = 0; i < names_.length(); ++i) {
     CQPerfTraceData *trace = CQPerfMonitorInst->getTrace(names_[i]);
@@ -987,7 +987,7 @@ drawDepthGraph(QPainter *p)
   // calc y axis ranges
   CInterval depthInterval;
 
-  depthInterval = CInterval(0, std::max(maxDepth, 1), 10);
+  depthInterval = CInterval(0, std::max(maxDepth, 1U), 10U);
 
   depthInterval.setIntegral(true);
 
@@ -1044,7 +1044,7 @@ drawDepthGraph(QPainter *p)
 
   double tx = width()/2 - fm.width(title)/2;
 
-  p->drawText(tx, fa + 2, title);
+  p->drawText(int(tx), fa + 2, title);
 
   //---
 
@@ -1053,7 +1053,7 @@ drawDepthGraph(QPainter *p)
 
   tx = width()/2 - fm.width(xlabel)/2;
 
-  p->drawText(tx, height() - fm.descent() - 2, xlabel);
+  p->drawText(int(tx), height() - fm.descent() - 2, xlabel);
 
   //---
 
@@ -1075,14 +1075,14 @@ drawDepthGraph(QPainter *p)
 
   TraceDrawDatas traceDrawDatas;
 
-  traceDrawDatas.resize(names_.size());
+  traceDrawDatas.resize(uint(names_.size()));
 
   tipRects_.clear();
 
   //---
 
-  for (int i = 0; i < names_.length(); ++i) {
-    CQPerfTraceData *trace = CQPerfMonitorInst->getTrace(names_[i]);
+  for (uint i = 0; i < uint(names_.length()); ++i) {
+    auto *trace = CQPerfMonitorInst->getTrace(names_[int(i)]);
 
     TraceRectTips &traceRectTips = traceDrawDatas[i];
 
@@ -1102,12 +1102,12 @@ drawDepthGraph(QPainter *p)
                   "<tr><td colspan=2>%1</td></tr>"
                   "<tr><td>Elapsed</td><td>%2</td></tr>"
                   "</table>").
-                  arg(names_[i]).
+                  arg(names_[int(i)]).
                   arg(formatTime(deltaTime));
 
         QRectF rect(startTime, timeData.depth - 1, deltaTime, 1);
 
-        traceRectTips.rectTips.push_back(RectTip(rect, names_[i], tipText));
+        traceRectTips.rectTips.push_back(RectTip(rect, names_[int(i)], tipText));
       }
     }
     else {
@@ -1122,12 +1122,12 @@ drawDepthGraph(QPainter *p)
                   "<tr><td colspan=2>%1</td></tr>"
                   "<tr><td>Elapsed</td><td>%2</td></tr>"
                   "</table>").
-                  arg(names_[i]).
+                  arg(names_[int(i)]).
                   arg(formatTime(deltaTime));
 
         QRectF rect(startTime, timeData.depth - 1, deltaTime, 1);
 
-        traceRectTips.rectTips.push_back(RectTip(rect, names_[i], tipText));
+        traceRectTips.rectTips.push_back(RectTip(rect, names_[int(i)], tipText));
       }
     }
   }
@@ -1138,7 +1138,7 @@ drawDepthGraph(QPainter *p)
 
   p->setClipRect(irect);
 
-  for (int i = 0; i < names_.length(); ++i) {
+  for (uint i = 0; i < uint(names_.length()); ++i) {
     TraceRectTips &traceRectTips = traceDrawDatas[i];
 
     // draw rects
@@ -1154,7 +1154,7 @@ drawDepthGraph(QPainter *p)
         QColor pc = QColor("#000000"); pc.setAlphaF(0.5);
         p->setPen(pc);
 
-        QColor c = bgColor(i);
+        QColor c = bgColor(int(i));
         p->setBrush(c);
 
         QRectF rect(px1, py1, px2 - px1, py2 - py1);
@@ -1166,7 +1166,7 @@ drawDepthGraph(QPainter *p)
 
           p->setClipRect(rect.adjusted(2, 2, -2, -2));
 
-          p->drawText(rect.left() + 2, rect.center().y() + (fa - fd)/2, rectTip.name);
+          p->drawText(int(rect.left() + 2), int(rect.center().y() + (fa - fd)/2), rectTip.name);
 
           p->setClipRect(irect);
         }
@@ -1174,10 +1174,10 @@ drawDepthGraph(QPainter *p)
         tipRects_.push_back(TipRect(rect, rectTip.tip));
       }
       else {
-        QColor c = bgColor(i);
+        QColor c = bgColor(int(i));
         p->setPen(c);
 
-        p->drawLine((px1 + px2)/2, py1, (px1 + px2)/2, py2);
+        p->drawLine(int((px1 + px2)/2), int(py1), int((px1 + px2)/2), int(py2));
       }
     }
   }
@@ -1298,7 +1298,7 @@ drawStatsGraph(QPainter *p)
 
   double tx = width()/2 - fm.width(title)/2;
 
-  p->drawText(tx, fa + 2, title);
+  p->drawText(int(tx), fa + 2, title);
 
   //---
 
@@ -1307,7 +1307,7 @@ drawStatsGraph(QPainter *p)
 
   tx = width()/2 - fm.width(xlabel)/2;
 
-  p->drawText(tx, height() - fm.descent() - 2, xlabel);
+  p->drawText(int(tx), height() - fm.descent() - 2, xlabel);
 
   //---
 
@@ -1435,18 +1435,18 @@ drawAxis(QPainter *p, const CInterval &interval, bool isLeft, bool isCalls)
     else
       ax = width() - rmargin_ + 6;
 
-    p->drawText(ax, ay + (fa - fd)/2, text);
+    p->drawText(int(ax), int(ay + (fa - fd)/2), text);
 
     if (isLeft)
-      p->drawLine(lmargin_ - 4, ay, lmargin_, ay);
+      p->drawLine(lmargin_ - 4, int(ay), lmargin_, int(ay));
     else
-      p->drawLine(width() - rmargin_, ay, width() - rmargin_ + 4, ay);
+      p->drawLine(width() - rmargin_, int(ay), width() - rmargin_ + 4, int(ay));
   }
 
   if (isLeft)
-    p->drawLine(lmargin_, ay1, lmargin_, ay2);
+    p->drawLine(lmargin_, int(ay1), lmargin_, int(ay2));
   else
-    p->drawLine(width() - rmargin_, ay1, width() - rmargin_, ay2);
+    p->drawLine(width() - rmargin_, int(ay1), width() - rmargin_, int(ay2));
 }
 
 void
@@ -1469,7 +1469,7 @@ drawGrid(QPainter *p, const CInterval &interval)
     double ax1 = lmargin_;
     double ax2 = width() - rmargin_;
 
-    p->drawLine(ax1, ay, ax2, ay);
+    p->drawLine(int(ax1), int(ay), int(ax2), int(ay));
   }
 }
 

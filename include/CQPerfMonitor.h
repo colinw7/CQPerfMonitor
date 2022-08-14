@@ -20,7 +20,7 @@ class CMessage;
 #define CQPerfMonitorInst CQPerfMonitor::getInstance()
 
 struct CQPerfTimeData {
-  int     depth { 0 };
+  uint    depth { 0 };
   CHRTime start;
   CHRTime elapsed;
 };
@@ -72,8 +72,8 @@ class CQPerfMonitor : public QObject {
 
   //---
 
-  int windowCount() const { return windowCount_; }
-  void setWindowCount(int i) { windowCount_ = i; }
+  uint windowCount() const { return windowCount_; }
+  void setWindowCount(uint i) { windowCount_ = i; }
 
   const CHRTime &windowTime() const { return windowTime_; }
   void setWindowTime(const CHRTime &v) { windowTime_ = v; }
@@ -150,10 +150,10 @@ class CQPerfMonitor : public QObject {
   bool               debug_       { false }; //!< is debug enabled
   bool               recording_   { false }; //!< is recording
   Traces             traces_;                //!< active traces
-  int                windowCount_ { 1000 };  //!< number of traces to keep in history
+  uint               windowCount_ { 1000 };  //!< number of traces to keep in history
   CHRTime            windowTime_;            //!< time span for history
-  int                numTrace_    { 0 };     //!< number of active traces
-  int                numDebug_    { 0 };     //!< number of active debugs
+  uint               numTrace_    { 0 };     //!< number of active traces
+  uint               numDebug_    { 0 };     //!< number of active debugs
   int                minTime_     { - 1 };   //!< minimum debug time
   Names              names_;                 //!< buffered names
   mutable std::mutex mutex_;                 //!< update mutex
@@ -190,13 +190,13 @@ class CQPerfTraceData {
 
   //---
 
-  void startTrace(int depth=0);
+  void startTrace(uint depth=0);
   void endTrace  (TraceType traceType);
   void addTrace  (const TimeData &timeData, TraceType traceType);
 
   //---
 
-  void startDebug(int depth=0);
+  void startDebug(uint depth=0);
   void endDebug  ();
   void addDebug  (const TimeData &timeData);
 
@@ -254,19 +254,19 @@ class CQPerfTraceData {
 
   int fixPos(int i) const;
 
-  int windowSize() const;
+  uint windowSize() const;
 
  private:
   const TimeData &timeData(int i) const {
     assert(i >= 0 && i < int(times_.size()));
 
-    return times_[i];
+    return times_[size_t(i)];
   }
 
   void setTimeData(int i, const TimeData &t) {
     assert(i >= 0 && i < int(times_.size()));
 
-    times_[i] = t;
+    times_[size_t(i)] = t;
   }
 
  private:

@@ -193,7 +193,7 @@ startDebug(const QString &name)
       names_.emplace_back(name);
     }
     else {
-      auto msg = QString(">%1%2").arg(" ", numDebug_).arg(name);
+      auto msg = QString(">%1%2").arg(" ", int(numDebug_)).arg(name);
 
       log(msg);
     }
@@ -218,15 +218,15 @@ endDebug(const QString &name)
     if (minTime() > 0) {
       // if longer than elapsed flush stack
       if (e.getMSecs() >= minTime()) {
-        int n  = names_.size();
-        int nd = numDebug_ - n + 1;
+        uint n  = uint(names_.size());
+        uint nd = numDebug_ - n + 1;
 
         // show unflushed start names
-        for (int i = 0; i < n; ++i) {
+        for (uint i = 0; i < n; ++i) {
           auto &nameData = names_[i];
 
           if (! nameData.flushed) {
-            auto smsg = QString(">%1%2").arg(" ", nd).arg(nameData.name);
+            auto smsg = QString(">%1%2").arg(" ", int(nd)).arg(nameData.name);
 
             log(smsg);
 
@@ -242,7 +242,7 @@ endDebug(const QString &name)
         if (n > 0) {
           const auto &nameData = names_[n - 1];
 
-          auto emsg = QString("<%1%2 %3").arg(" ", nd).
+          auto emsg = QString("<%1%2 %3").arg(" ", int(nd)).
                         arg(nameData.name).arg(e.getSecs(), 0, 'f', 6);
 
           log(emsg);
@@ -257,7 +257,8 @@ endDebug(const QString &name)
       }
     }
     else {
-      auto msg = QString("<%1%2 %3").arg(" ", numDebug_).arg(name).arg(e.getSecs(), 0, 'f', 6);
+      auto msg = QString("<%1%2 %3").arg(" ", int(numDebug_)).
+                   arg(name).arg(e.getSecs(), 0, 'f', 6);
 
       log(msg);
     }
@@ -279,7 +280,8 @@ addDebug(const QString &name, const TimeData &timeData)
 
     const CHRTime &e = timeData.elapsed;
 
-    auto msg = QString("%1%2 %3").arg(" ", numDebug_).arg(name).arg(e.getSecs(), 0, 'f', 6);
+    auto msg = QString("%1%2 %3").arg(" ", int(numDebug_)).
+                 arg(name).arg(e.getSecs(), 0, 'f', 6);
 
     log(msg);
   }
@@ -512,7 +514,7 @@ CQPerfTraceData(const QString &name) :
 
 void
 CQPerfTraceData::
-startTrace(int depth)
+startTrace(uint depth)
 {
   timeData_.depth = depth;
   timeData_.start = CHRTime::getTime();
@@ -551,13 +553,13 @@ addTrace(const TimeData &timeData, TraceType traceType)
   //---
 
   // get limits of window count and time
-  int     windowCount = CQPerfMonitorInst->windowCount();
+  uint    windowCount = CQPerfMonitorInst->windowCount();
   CHRTime windowTime  = CQPerfMonitorInst->windowTime ();
 
   //---
 
   // add new time
-  int nt = times_.size();
+  uint nt = uint(times_.size());
 
   posStart_ = posStartNext_;
 
@@ -565,8 +567,8 @@ addTrace(const TimeData &timeData, TraceType traceType)
     if (nt >= windowCount) {
       ++posStartNext_;
 
-      if (posStartNext_ >= nt)
-        posStartNext_ -= nt;
+      if (posStartNext_ >= int(nt))
+        posStartNext_ -= int(nt);
     }
   }
 
@@ -590,11 +592,11 @@ addTrace(const TimeData &timeData, TraceType traceType)
   //---
 
   if (windowTime.isSet()) {
-    int i = 0;
-    int n = windowCount;
+    uint i = 0;
+    uint n = windowCount;
 
     for ( ; i < n; ++i) {
-      int pos = fixPos(posStart_ + i);
+      int pos = fixPos(posStart_ + int(i));
 
       if (this->timeData(pos).start >= windowTime)
         break;
@@ -614,7 +616,7 @@ addTrace(const TimeData &timeData, TraceType traceType)
 
 void
 CQPerfTraceData::
-startDebug(int depth)
+startDebug(uint depth)
 {
   timeData_.depth = depth;
   timeData_.start = CHRTime::getTime();
@@ -711,10 +713,10 @@ void
 CQPerfTraceData::
 windowDetails(WindowData &windowData) const
 {
-  int n = windowSize();
+  uint n = windowSize();
 
-  for (int i = 0; i < n; ++i) {
-    int pos = fixPos(posStart_ + i);
+  for (uint i = 0; i < n; ++i) {
+    int pos = fixPos(posStart_ + int(i));
 
     const TimeData &data = timeData(pos);
 
@@ -738,10 +740,10 @@ void
 CQPerfTraceData::
 windowDetails(const CHRTime &t1, const CHRTime &t2, WindowData &windowData) const
 {
-  int n = windowSize();
+  uint n = windowSize();
 
-  for (int i = 0; i < n; ++i) {
-    int pos = fixPos(posStart_ + i);
+  for (uint i = 0; i < n; ++i) {
+    int pos = fixPos(posStart_ + int(i));
 
     const TimeData &data = timeData(pos);
 
@@ -767,10 +769,10 @@ void
 CQPerfTraceData::
 windowDetails(const CHRTime &t1, const CHRTime &t2, TimeDatas &timeDatas) const
 {
-  int n = windowSize();
+  uint n = windowSize();
 
-  for (int i = 0; i < n; ++i) {
-    int pos = fixPos(posStart_ + i);
+  for (uint i = 0; i < n; ++i) {
+    int pos = fixPos(posStart_ + int(i));
 
     const TimeData &data = timeData(pos);
 
@@ -796,12 +798,12 @@ int
 CQPerfTraceData::
 posEnd() const
 {
-  int nt = times_.size();
+  uint nt = uint(times_.size());
 
-  int posEnd = posStart_ + nt;
+  int posEnd = posStart_ + int(nt);
 
-  if (posEnd >= nt)
-    posEnd -= nt;
+  if (posEnd >= int(nt))
+    posEnd -= int(nt);
 
   return posEnd;
 }
@@ -810,17 +812,17 @@ int
 CQPerfTraceData::
 fixPos(int i) const
 {
-  int nt = times_.size();
+  uint nt = uint(times_.size());
 
-  while (i <  0 ) i += nt;
-  while (i >= nt) i -= nt;
+  while (i <  0      ) i += int(nt);
+  while (i >= int(nt)) i -= int(nt);
 
   return i;
 }
 
-int
+uint
 CQPerfTraceData::
 windowSize() const
 {
-  return times_.size();
+  return uint(times_.size());
 }

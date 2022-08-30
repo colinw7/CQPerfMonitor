@@ -2,6 +2,9 @@
 #define CMESSAGE_H
 
 #include <map>
+#include <string>
+#include <cstddef>
+#include <sys/types.h>
 
 #define CMessageMgrInst CMessageMgr::getInstance()
 

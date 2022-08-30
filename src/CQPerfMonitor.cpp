@@ -498,7 +498,7 @@ CQPerfTraceData(const QString &name) :
   if (pattern.empty())
     pattern = "*";
 
-  auto patterns = QString(pattern.c_str()).split("|", QString::SkipEmptyParts);
+  auto patterns = QString(pattern.c_str()).split("|", Qt::SkipEmptyParts);
 
   for (int i = 0; i < patterns.length(); ++i) {
     QRegExp regexp(patterns[i], Qt::CaseSensitive, QRegExp::WildcardUnix);

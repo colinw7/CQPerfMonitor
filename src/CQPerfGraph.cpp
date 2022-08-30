@@ -15,6 +15,7 @@
 #include <QScrollBar>
 #include <QVBoxLayout>
 #include <QPainter>
+#include <QPainterPath>
 #include <QTimer>
 #include <QContextMenuEvent>
 #include <QMenu>
@@ -58,11 +59,11 @@ QColor bgColor(int i) {
 
 QString formatTime(double usecs) {
   if      (usecs >= 1000000)
-    return QString().sprintf("%.3f secs", usecs/1000000);
+    return QString::asprintf("%.3f secs", usecs/1000000);
   else if (usecs >= 1000)
-    return QString().sprintf("%.3f msecs", usecs/1000);
+    return QString::asprintf("%.3f msecs", usecs/1000);
   else
-    return QString().sprintf("%.3f usecs", usecs);
+    return QString::asprintf("%.3f usecs", usecs);
 }
 
 QString formatTime(const CHRTime &t) {
@@ -678,15 +679,15 @@ drawIntervalGraph(QPainter *p)
 //int fd = fm.descent();
 
   if      (isShowElapsed() && isShowCount()) {
-    lmargin_ = fm.width(QString().sprintf("%d"  , maxCalls  )) + 8;
-    rmargin_ = fm.width(QString().sprintf("%.3f", maxElapsed)) + 8;
+    lmargin_ = fm.horizontalAdvance(QString::asprintf("%d"  , maxCalls  )) + 8;
+    rmargin_ = fm.horizontalAdvance(QString::asprintf("%.3f", maxElapsed)) + 8;
   }
   else if (isShowElapsed()) {
-    lmargin_ = fm.width(QString().sprintf("%.3f", maxElapsed)) + 8;
+    lmargin_ = fm.horizontalAdvance(QString::asprintf("%.3f", maxElapsed)) + 8;
     rmargin_ = 2;
   }
   else if (isShowCount()) {
-    lmargin_ = fm.width(QString().sprintf("%d"  , maxCalls  )) + 8;
+    lmargin_ = fm.horizontalAdvance(QString::asprintf("%d"  , maxCalls  )) + 8;
     rmargin_ = 0;
   }
   else {
@@ -740,7 +741,7 @@ drawIntervalGraph(QPainter *p)
     title += names_[i];
   }
 
-  double tx = width()/2 - fm.width(title)/2;
+  double tx = width()/2 - fm.horizontalAdvance(title)/2;
 
   p->drawText(int(tx), fa + 2, title);
 
@@ -749,7 +750,7 @@ drawIntervalGraph(QPainter *p)
   // draw x label
   QString xlabel = formatTime(xmax_ - xmin_);
 
-  tx = width()/2 - fm.width(xlabel)/2;
+  tx = width()/2 - fm.horizontalAdvance(xlabel)/2;
 
   p->drawText(int(tx), height() - fm.descent() - 2, xlabel);
 
@@ -1002,7 +1003,7 @@ drawDepthGraph(QPainter *p)
   int fa = fm.ascent();
   int fd = fm.descent();
 
-  lmargin_ = fm.width(QString().sprintf("%d", maxDepth)) + 8;
+  lmargin_ = fm.horizontalAdvance(QString::asprintf("%d", maxDepth)) + 8;
   rmargin_ = 0;
 
   tmargin_ = fm.height() + fm.height()/2 + 4;
@@ -1042,7 +1043,7 @@ drawDepthGraph(QPainter *p)
     title += names_[i];
   }
 
-  double tx = width()/2 - fm.width(title)/2;
+  double tx = width()/2 - fm.horizontalAdvance(title)/2;
 
   p->drawText(int(tx), fa + 2, title);
 
@@ -1051,7 +1052,7 @@ drawDepthGraph(QPainter *p)
   // draw x label
   QString xlabel = formatTime(xmax_ - xmin_);
 
-  tx = width()/2 - fm.width(xlabel)/2;
+  tx = width()/2 - fm.horizontalAdvance(xlabel)/2;
 
   p->drawText(int(tx), height() - fm.descent() - 2, xlabel);
 
@@ -1234,15 +1235,15 @@ drawStatsGraph(QPainter *p)
 //int fd = fm.descent();
 
   if      (isShowElapsed() && isShowCount()) {
-    lmargin_ = fm.width(QString().sprintf("%d"  , maxCalls  )) + 8;
-    rmargin_ = fm.width(QString().sprintf("%.3f", maxElapsed)) + 8;
+    lmargin_ = fm.horizontalAdvance(QString::asprintf("%d"  , maxCalls  )) + 8;
+    rmargin_ = fm.horizontalAdvance(QString::asprintf("%.3f", maxElapsed)) + 8;
   }
   else if (isShowElapsed()) {
-    lmargin_ = fm.width(QString().sprintf("%.3f", maxElapsed)) + 8;
+    lmargin_ = fm.horizontalAdvance(QString::asprintf("%.3f", maxElapsed)) + 8;
     rmargin_ = 2;
   }
   else if (isShowCount()) {
-    lmargin_ = fm.width(QString().sprintf("%d"  , maxCalls  )) + 8;
+    lmargin_ = fm.horizontalAdvance(QString::asprintf("%d"  , maxCalls  )) + 8;
     rmargin_ = 0;
   }
   else {
@@ -1296,7 +1297,7 @@ drawStatsGraph(QPainter *p)
     title += names_[i];
   }
 
-  double tx = width()/2 - fm.width(title)/2;
+  double tx = width()/2 - fm.horizontalAdvance(title)/2;
 
   p->drawText(int(tx), fa + 2, title);
 
@@ -1305,7 +1306,7 @@ drawStatsGraph(QPainter *p)
   // draw x label
   QString xlabel = formatTime(xmax_ - xmin_);
 
-  tx = width()/2 - fm.width(xlabel)/2;
+  tx = width()/2 - fm.horizontalAdvance(xlabel)/2;
 
   p->drawText(int(tx), height() - fm.descent() - 2, xlabel);
 
@@ -1426,12 +1427,12 @@ drawAxis(QPainter *p, const CInterval &interval, bool isLeft, bool isCalls)
     if (isCalls)
       text = QString("%1").arg(y);
     else
-      text = QString().sprintf("%.3f", y/1000.0);
+      text = QString::asprintf("%.3f", y/1000.0);
 
     double ax;
 
     if (isLeft)
-      ax = lmargin_ - fm.width(text) - 6;
+      ax = lmargin_ - fm.horizontalAdvance(text) - 6;
     else
       ax = width() - rmargin_ + 6;
 
@@ -1560,7 +1561,7 @@ class CQPerfListRealItem : public QTableWidgetItem {
   }
 
   double value() const { return value_; }
-  void setValue(double r) { value_ = r; setText(QString().sprintf("%.6f", value_)); }
+  void setValue(double r) { value_ = r; setText(QString::asprintf("%.6f", value_)); }
 
  private:
   double value_ { 0.0 };
@@ -1581,7 +1582,7 @@ class CQPerfListIntItem : public QTableWidgetItem {
   }
 
   int value() const { return value_; }
-  void setValue(int i) { value_ = i; setText(QString().sprintf("%d", value_)); }
+  void setValue(int i) { value_ = i; setText(QString::asprintf("%d", value_)); }
 
  private:
   int value_ { 0 };

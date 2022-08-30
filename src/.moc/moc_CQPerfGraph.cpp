@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'CQPerfGraph.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.12.8)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../include/CQPerfGraph.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'CQPerfGraph.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.12.8. It"
+#error "This file was generated using the moc from 5.15.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -124,7 +125,7 @@ void CQPerfDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         auto *_t = static_cast<CQPerfDialog *>(_o);
-        Q_UNUSED(_t)
+        (void)_t;
         switch (_id) {
         case 0: _t->setTimeout((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 1: _t->setName((*reinterpret_cast< const QString(*)>(_a[1]))); break;
@@ -147,7 +148,7 @@ void CQPerfDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
 #ifndef QT_NO_PROPERTIES
     else if (_c == QMetaObject::ReadProperty) {
         auto *_t = static_cast<CQPerfDialog *>(_o);
-        Q_UNUSED(_t)
+        (void)_t;
         void *_v = _a[0];
         switch (_id) {
         case 0: *reinterpret_cast< int*>(_v) = _t->timeout(); break;
@@ -155,7 +156,7 @@ void CQPerfDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         }
     } else if (_c == QMetaObject::WriteProperty) {
         auto *_t = static_cast<CQPerfDialog *>(_o);
-        Q_UNUSED(_t)
+        (void)_t;
         void *_v = _a[0];
         switch (_id) {
         case 0: _t->setTimeout(*reinterpret_cast< int*>(_v)); break;
@@ -167,7 +168,7 @@ void CQPerfDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
 }
 
 QT_INIT_METAOBJECT const QMetaObject CQPerfDialog::staticMetaObject = { {
-    &QDialog::staticMetaObject,
+    QMetaObject::SuperData::link<QDialog::staticMetaObject>(),
     qt_meta_stringdata_CQPerfDialog.data,
     qt_meta_data_CQPerfDialog,
     qt_static_metacall,
@@ -321,7 +322,7 @@ void CQPerfGraph::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         auto *_t = static_cast<CQPerfGraph *>(_o);
-        Q_UNUSED(_t)
+        (void)_t;
         switch (_id) {
         case 0: _t->setWindowSize((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 1: _t->setNumIntervals((*reinterpret_cast< int(*)>(_a[1]))); break;
@@ -338,7 +339,7 @@ void CQPerfGraph::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
 #ifndef QT_NO_PROPERTIES
     else if (_c == QMetaObject::ReadProperty) {
         auto *_t = static_cast<CQPerfGraph *>(_o);
-        Q_UNUSED(_t)
+        (void)_t;
         void *_v = _a[0];
         switch (_id) {
         case 0: *reinterpret_cast< bool*>(_v) = _t->isShowTotal(); break;
@@ -354,7 +355,7 @@ void CQPerfGraph::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         }
     } else if (_c == QMetaObject::WriteProperty) {
         auto *_t = static_cast<CQPerfGraph *>(_o);
-        Q_UNUSED(_t)
+        (void)_t;
         void *_v = _a[0];
         switch (_id) {
         case 0: _t->setShowTotal(*reinterpret_cast< bool*>(_v)); break;
@@ -374,7 +375,7 @@ void CQPerfGraph::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
 }
 
 QT_INIT_METAOBJECT const QMetaObject CQPerfGraph::staticMetaObject = { {
-    &QFrame::staticMetaObject,
+    QMetaObject::SuperData::link<QFrame::staticMetaObject>(),
     qt_meta_stringdata_CQPerfGraph.data,
     qt_meta_data_CQPerfGraph,
     qt_static_metacall,
@@ -505,7 +506,7 @@ void CQPerfList::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         auto *_t = static_cast<CQPerfList *>(_o);
-        Q_UNUSED(_t)
+        (void)_t;
         switch (_id) {
         case 0: _t->nameSelected((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 1: _t->namesSelected((*reinterpret_cast< const QStringList(*)>(_a[1]))); break;
@@ -535,7 +536,7 @@ void CQPerfList::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
 #ifndef QT_NO_PROPERTIES
     else if (_c == QMetaObject::ReadProperty) {
         auto *_t = static_cast<CQPerfList *>(_o);
-        Q_UNUSED(_t)
+        (void)_t;
         void *_v = _a[0];
         switch (_id) {
         case 0: *reinterpret_cast< bool*>(_v) = _t->isSingleSelect(); break;
@@ -543,7 +544,7 @@ void CQPerfList::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         }
     } else if (_c == QMetaObject::WriteProperty) {
         auto *_t = static_cast<CQPerfList *>(_o);
-        Q_UNUSED(_t)
+        (void)_t;
         void *_v = _a[0];
         switch (_id) {
         case 0: _t->setSingleSelect(*reinterpret_cast< bool*>(_v)); break;
@@ -555,7 +556,7 @@ void CQPerfList::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
 }
 
 QT_INIT_METAOBJECT const QMetaObject CQPerfList::staticMetaObject = { {
-    &QTableWidget::staticMetaObject,
+    QMetaObject::SuperData::link<QTableWidget::staticMetaObject>(),
     qt_meta_stringdata_CQPerfList.data,
     qt_meta_data_CQPerfList,
     qt_static_metacall,
@@ -614,14 +615,14 @@ int CQPerfList::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 // SIGNAL 0
 void CQPerfList::nameSelected(const QString & _t1)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 
 // SIGNAL 1
 void CQPerfList::namesSelected(const QStringList & _t1)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 QT_WARNING_POP

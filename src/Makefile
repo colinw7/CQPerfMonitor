@@ -436,6 +436,7 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 		../include/CQPerfMonitor.h \
 		../../COS/include/CHRTime.h \
 		../../CQUtil/include/CQTabSplit.h \
+		../../CQUtil/include/CQIconButton.h \
 		../../CQUtil/include/CQUtil.h \
 		../../CQUtil/include/CQUtilMeta.h \
 		../../CUtil/include/CInterval.h \

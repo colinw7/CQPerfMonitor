@@ -325,7 +325,7 @@ setTimeout(int t)
 
     delete timer_;
 
-    timer_ = 0;
+    timer_ = nullptr;
   }
 
   if (! timer_) {
@@ -1554,7 +1554,7 @@ class CQPerfListRealItem : public QTableWidgetItem {
     setValue(r);
   }
 
-  bool operator<(const QTableWidgetItem &rhs) const {
+  bool operator<(const QTableWidgetItem &rhs) const override {
     const CQPerfListRealItem &rrhs = dynamic_cast<const CQPerfListRealItem &>(rhs);
 
     return (value_ < rrhs.value_);
@@ -1575,7 +1575,7 @@ class CQPerfListIntItem : public QTableWidgetItem {
     setValue(i);
   }
 
-  bool operator<(const QTableWidgetItem &rhs) const {
+  bool operator<(const QTableWidgetItem &rhs) const override {
     const CQPerfListIntItem &irhs = dynamic_cast<const CQPerfListIntItem &>(rhs);
 
     return (value_ < irhs.value_);

@@ -1417,7 +1417,7 @@ drawAxis(QPainter *p, const CInterval &interval, bool isLeft, bool isCalls)
 
   double dy1 = (ay1 - ay2)/interval.calcNumMajor();
 
-  for (int i = 0; i <= interval.calcNumMajor(); ++i) {
+  for (uint i = 0; i <= interval.calcNumMajor(); ++i) {
     double y = interval.interval(i);
 
     double ay = ay1 - i*dy1;
@@ -1464,7 +1464,7 @@ drawGrid(QPainter *p, const CInterval &interval)
 
   double dy1 = (ay1 - ay2)/interval.calcNumMajor();
 
-  for (int i = 0; i <= interval.calcNumMajor(); ++i) {
+  for (uint i = 0; i <= interval.calcNumMajor(); ++i) {
     double ay = ay1 - i*dy1;
 
     double ax1 = lmargin_;

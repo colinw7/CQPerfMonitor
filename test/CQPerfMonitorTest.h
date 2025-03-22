@@ -12,7 +12,7 @@ class CQPerfMonitorTest : public QFrame {
   CQPerfMonitorTest(bool server);
  ~CQPerfMonitorTest();
 
-  QSize sizeHint() const { return QSize(800, 600); }
+  QSize sizeHint() const override { return QSize(800, 600); }
 
  private slots:
   void timerSlot();

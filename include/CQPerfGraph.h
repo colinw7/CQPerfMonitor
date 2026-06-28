@@ -214,6 +214,7 @@ class CQPerfList : public QTableWidget {
 
  private:
   bool singleSelect_ { false };
+  bool loading_      { false };
 };
 
 #endif

@@ -92,17 +92,17 @@ CQPerfDialog(QWidget *parent) :
 
   setWindowTitle("Performance Monitor Graph");
 
-  QVBoxLayout *layout = new QVBoxLayout(this);
+  auto *layout = new QVBoxLayout(this);
   layout->setMargin(0); layout->setSpacing(2);
 
   //----
 
-  QFrame *controlFrame = new QFrame;
+  auto *controlFrame = new QFrame;
   controlFrame->setObjectName("controlFrame");
 
   controlFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-  QHBoxLayout *controlLayout = new QHBoxLayout(controlFrame);
+  auto *controlLayout = new QHBoxLayout(controlFrame);
   controlLayout->setMargin(2); controlLayout->setSpacing(2);
 
   //---
@@ -188,10 +188,10 @@ CQPerfDialog(QWidget *parent) :
 
   //----
 
-  QFrame *graphFrame = new QFrame;
+  auto *graphFrame = new QFrame;
   graphFrame->setObjectName("graphFrame");
 
-  QVBoxLayout *graphLayout = new QVBoxLayout(graphFrame);
+  auto *graphLayout = new QVBoxLayout(graphFrame);
   graphLayout->setMargin(0); graphLayout->setSpacing(0);
 
   splitter->addWidget(graphFrame, "Graph");
@@ -204,7 +204,7 @@ CQPerfDialog(QWidget *parent) :
 
   //--
 
-  QFrame *scrollFrame = new QFrame;
+  auto *scrollFrame = new QFrame;
   scrollFrame->setObjectName("scrollFrame");
 
   scrollFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -213,10 +213,10 @@ CQPerfDialog(QWidget *parent) :
 
   //--
 
-  QHBoxLayout *scrollLayout = new QHBoxLayout(scrollFrame);
+  auto *scrollLayout = new QHBoxLayout(scrollFrame);
   scrollLayout->setMargin(2); scrollLayout->setSpacing(2);
 
-  CQImageButton *zoomOutButton = new CQImageButton(CQPixmapCacheInst->getIcon("PERF_ZOOM_OUT"));
+  auto *zoomOutButton = new CQImageButton(CQPixmapCacheInst->getIcon("PERF_ZOOM_OUT"));
   zoomOutButton->setObjectName("zoomOutButton");
 
   connect(zoomOutButton, SIGNAL(clicked()), this, SLOT(zoomOutSlot()));
@@ -233,7 +233,7 @@ CQPerfDialog(QWidget *parent) :
 
   scrollLayout->addWidget(graphScroll_);
 
-  CQImageButton *zoomInButton  = new CQImageButton(CQPixmapCacheInst->getIcon("PERF_ZOOM_IN"));
+  auto *zoomInButton = new CQImageButton(CQPixmapCacheInst->getIcon("PERF_ZOOM_IN"));
   zoomInButton->setObjectName("zoomInButton");
 
   connect(zoomInButton, SIGNAL(clicked()), this, SLOT(zoomInSlot()));
@@ -526,11 +526,11 @@ void
 CQPerfGraph::
 contextMenuEvent(QContextMenuEvent *event)
 {
-  QMenu *menu = new QMenu;
+  auto *menu = new QMenu;
 
   //---
 
-  QAction *totalAction = new QAction("Total", menu);
+  auto *totalAction = new QAction("Total", menu);
 
   totalAction->setCheckable(true);
   totalAction->setChecked(isShowTotal());
@@ -658,14 +658,14 @@ drawIntervalGraph(QPainter *p)
   // calc y axis ranges
   CInterval callsInterval, elapsedInterval;
 
-  callsInterval = CInterval(0, std::max(maxCalls, 1), 10);
+  callsInterval = CInterval(0, std::max(maxCalls, 1));
 
   callsInterval.setIntegral(true);
 
   ymin1_ = callsInterval.calcStart();
   ymax1_ = callsInterval.calcEnd  ();
 
-  elapsedInterval = CInterval(0, std::max(maxElapsed, 1.0), 10);
+  elapsedInterval = CInterval(0, std::max(maxElapsed, 1.0));
 
   ymin2_ = elapsedInterval.calcStart();
   ymax2_ = elapsedInterval.calcEnd  ();
@@ -988,7 +988,7 @@ drawDepthGraph(QPainter *p)
   // calc y axis ranges
   CInterval depthInterval;
 
-  depthInterval = CInterval(0, std::max(maxDepth, 1U), 10U);
+  depthInterval = CInterval(0, std::max(maxDepth, 1U));
 
   depthInterval.setIntegral(true);
 
@@ -1214,14 +1214,14 @@ drawStatsGraph(QPainter *p)
   // calc y axis ranges
   CInterval callsInterval, elapsedInterval;
 
-  callsInterval = CInterval(0, std::max(maxCalls, 1), 10);
+  callsInterval = CInterval(0, std::max(maxCalls, 1));
 
   callsInterval.setIntegral(true);
 
   ymin1_ = callsInterval.calcStart();
   ymax1_ = callsInterval.calcEnd  ();
 
-  elapsedInterval = CInterval(0, std::max(maxElapsed, 1.0), 10);
+  elapsedInterval = CInterval(0, std::max(maxElapsed, 1.0));
 
   ymin2_ = elapsedInterval.calcStart();
   ymax2_ = elapsedInterval.calcEnd  ();
@@ -1495,7 +1495,7 @@ CQPerfGraph::
 event(QEvent *e)
 {
   if (e->type() == QEvent::ToolTip) {
-    QHelpEvent *helpEvent = static_cast<QHelpEvent *>(e);
+    auto *helpEvent = static_cast<QHelpEvent *>(e);
 
     for (const auto &tipRect : tipRects_) {
       if (tipRect.rect.contains(helpEvent->pos())) {
@@ -1555,7 +1555,7 @@ class CQPerfListRealItem : public QTableWidgetItem {
   }
 
   bool operator<(const QTableWidgetItem &rhs) const override {
-    const CQPerfListRealItem &rrhs = dynamic_cast<const CQPerfListRealItem &>(rhs);
+    const auto &rrhs = dynamic_cast<const CQPerfListRealItem &>(rhs);
 
     return (value_ < rrhs.value_);
   }
@@ -1576,7 +1576,7 @@ class CQPerfListIntItem : public QTableWidgetItem {
   }
 
   bool operator<(const QTableWidgetItem &rhs) const override {
-    const CQPerfListIntItem &irhs = dynamic_cast<const CQPerfListIntItem &>(rhs);
+    const auto &irhs = dynamic_cast<const CQPerfListIntItem &>(rhs);
 
     return (value_ < irhs.value_);
   }
@@ -1620,6 +1620,8 @@ void
 CQPerfList::
 reload()
 {
+  loading_ = true;
+
   QStringList names;
 
   CQPerfMonitorInst->getTraceNames(names);
@@ -1638,13 +1640,13 @@ reload()
   setHorizontalHeaderItem(6, new QTableWidgetItem("Max Elapsed (ms)"));
 
   for (int i = 0; i < names.length(); ++i) {
-    QTableWidgetItem   *enabledItem = new QTableWidgetItem("");
-    QTableWidgetItem   *debugItem   = new QTableWidgetItem("");
-    QTableWidgetItem   *nameItem    = new QTableWidgetItem(names[i]);
-    CQPerfListIntItem  *countItem   = new CQPerfListIntItem ();
-    CQPerfListRealItem *elapsedItem = new CQPerfListRealItem();
-    CQPerfListRealItem *minItem     = new CQPerfListRealItem();
-    CQPerfListRealItem *maxItem     = new CQPerfListRealItem();
+    auto *enabledItem = new QTableWidgetItem("");
+    auto *debugItem   = new QTableWidgetItem("");
+    auto *nameItem    = new QTableWidgetItem(names[i]);
+    auto *countItem   = new CQPerfListIntItem ();
+    auto *elapsedItem = new CQPerfListRealItem();
+    auto *minItem     = new CQPerfListRealItem();
+    auto *maxItem     = new CQPerfListRealItem();
 
     enabledItem->setCheckState(Qt::Unchecked);
     debugItem  ->setCheckState(Qt::Unchecked);
@@ -1657,20 +1659,25 @@ reload()
     setItem(i, 5, minItem    );
     setItem(i, 6, maxItem    );
   }
+
+  loading_ = false;
 }
 
 void
 CQPerfList::
 refresh()
 {
+  if (loading_)
+    return;
+
   for (int i = 0; i < rowCount(); ++i) {
-    QTableWidgetItem   *enabledItem = item(i, 0);
-    QTableWidgetItem   *debugItem   = item(i, 1);
-    QTableWidgetItem   *nameItem    = item(i, 2);
-    CQPerfListIntItem  *countItem   = dynamic_cast<CQPerfListIntItem  *>(item(i, 3));
-    CQPerfListRealItem *elapsedItem = dynamic_cast<CQPerfListRealItem *>(item(i, 4));
-    CQPerfListRealItem *minItem     = dynamic_cast<CQPerfListRealItem *>(item(i, 5));
-    CQPerfListRealItem *maxItem     = dynamic_cast<CQPerfListRealItem *>(item(i, 6));
+    auto *enabledItem = item(i, 0);
+    auto *debugItem   = item(i, 1);
+    auto *nameItem    = item(i, 2);
+    auto *countItem   = dynamic_cast<CQPerfListIntItem  *>(item(i, 3));
+    auto *elapsedItem = dynamic_cast<CQPerfListRealItem *>(item(i, 4));
+    auto *minItem     = dynamic_cast<CQPerfListRealItem *>(item(i, 5));
+    auto *maxItem     = dynamic_cast<CQPerfListRealItem *>(item(i, 6));
 
     QString name = nameItem->text();
 
